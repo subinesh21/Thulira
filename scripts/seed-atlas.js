@@ -5,9 +5,10 @@
 require('dotenv').config({ path: '.env.local' });
 
 const mongoose = require('mongoose');
+const path = require('path');
 
 // Import product data from the centralized file
-const { PRODUCTS } = require('../lib/product-data.js');
+const { PRODUCTS } = require(path.join(__dirname, '..', 'lib', 'product-data.js'));
 
 async function seedAtlasDatabase() {
   try {
@@ -34,7 +35,7 @@ async function seedAtlasDatabase() {
     console.log('✅ Connected to MongoDB Atlas successfully!');
     
     // Import Product model
-    const Product = require('../models/Product');
+    const Product = require(path.join(__dirname, '..', 'models', 'Product'));
     
     // Clear existing products
     console.log('🗑️  Clearing existing products...');
