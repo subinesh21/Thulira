@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Check if user already exists
+    // @ts-ignore - Mongoose query union type issue
     const existingUser = await User.findOne({ mobile: normalizedMobile });
     
     // Generate OTP

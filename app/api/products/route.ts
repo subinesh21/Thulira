@@ -32,9 +32,10 @@ export async function GET(request: NextRequest) {
     if (id) {
       try {
         // Try to find by _id first
-        const productById = await Product.findOne({ 
-          _id: id, 
-          isActive: true 
+        // @ts-ignore - Mongoose query union type issue
+        const productById = await Product.findOne({
+          _id: id,
+          isActive: true
         }).lean();
         
         if (productById) {
@@ -46,9 +47,10 @@ export async function GET(request: NextRequest) {
         }
         
         // Try by id field
-        const productByFieldId = await Product.findOne({ 
-          id: id, 
-          isActive: true 
+        // @ts-ignore - Mongoose query union type issue
+        const productByFieldId = await Product.findOne({
+          id: id,
+          isActive: true
         }).lean();
         
         if (productByFieldId) {
@@ -62,9 +64,10 @@ export async function GET(request: NextRequest) {
         // Try numeric ID
         const numericId = parseInt(id);
         if (!isNaN(numericId)) {
-          const productByNumericId = await Product.findOne({ 
-            id: numericId, 
-            isActive: true 
+          // @ts-ignore - Mongoose query union type issue
+          const productByNumericId = await Product.findOne({
+            id: numericId,
+            isActive: true
           }).lean();
           
           if (productByNumericId) {
@@ -84,6 +87,7 @@ export async function GET(request: NextRequest) {
       }
     }
     
+    // @ts-ignore - Mongoose query union type issue
     const products = await Product.find(query).sort({ createdAt: -1 });
     
     return NextResponse.json({

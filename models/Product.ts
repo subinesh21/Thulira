@@ -73,7 +73,7 @@ const productSchema = new mongoose.Schema({
 
 // Update timestamps
 productSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
+  this.updatedAt = new Date() as any;
   next();
 });
 

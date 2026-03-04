@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
       query.$text = { $search: search };
     }
     
-    const products = await Product.find(query).sort({ createdAt: -1 });
+    // @ts-ignore - Mongoose query union type issue
+    const productQuery = Product.find(query);
+    const products = await productQuery.sort({ createdAt: -1 }).lean();
     
     return NextResponse.json({
       success: true,

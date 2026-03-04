@@ -80,7 +80,7 @@ BlogSchema.pre('save', function(next) {
   }
   
   if (this.isModified('isPublished') && this.isPublished && !this.publishedAt) {
-    this.publishedAt = new Date();
+    this.publishedAt = new Date() as any;
   }
   
   next();
