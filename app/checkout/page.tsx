@@ -14,7 +14,6 @@ import Link from 'next/link';
 import Sidebar from '@/components/sections/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
-import ScrollToTop from '@/components/ScrollToTop';
 import { toast } from 'react-toastify';
 import { DeliveryCalculator } from '@/lib/delivery-calculator';
 import { GSTCalculator } from '@/lib/gst-calculator';
@@ -752,7 +751,6 @@ export default function CheckoutPage() {
       </main>
 
       <Footer />
-      {showScrollTop && <ScrollToTop />}
     </div>
   );
 }

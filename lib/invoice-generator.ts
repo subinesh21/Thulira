@@ -1,11 +1,13 @@
 // Invoice Generation Service
 import * as pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { INVOICE_CONFIG } from './payment-config';
 import { GSTCalculator } from './gst-calculator';
 
+// Import fonts
+const pdfFonts = require('pdfmake/build/vfs_fonts');
+
 // Register fonts
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+(pdfMake as any).vfs = (pdfFonts as any).vfs;
 
 interface InvoiceItem {
   id: string;
