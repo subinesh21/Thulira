@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import ProductModel from '@/models/Product';
+import { Types } from 'mongoose';
 
 /**
  * GET - Fetch all product state overrides
@@ -10,13 +11,13 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Fetch only the fields we need for state management
-    const products = await ProductModel.find({})
+    // Use type assertion to help TypeScript
+    const products = await (ProductModel as any).find({})
       .select('_id id inStock isActive')
       .lean();
 
     // Convert to map format: { productId: { inStock, isActive } }
-    const statesMap: any = {};
+    const statesMap: Record<string, { inStock: boolean; isActive: boolean }> = {};
     
     for (const product of products) {
       const productId = product.id?.toString() || product._id.toString();
@@ -64,21 +65,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Build update object with only state fields
-    const update: any = {};
+    const update: Record<string, any> = {};
     if (inStock !== undefined) update.inStock = inStock;
     if (isActive !== undefined) update.isActive = isActive;
     update.updatedAt = new Date();
 
     // Try to find by numeric ID first, then by _id
-    let updatedProduct = await ProductModel.findOneAndUpdate(
-      { id: parseInt(productId) },
-      update,
-      { new: true, runValidators: true }
-    );
+    let updatedProduct;
+    
+    // Check if productId is a valid number for numeric ID search
+    const numericId = parseInt(productId);
+    if (!isNaN(numericId)) {
+      updatedProduct = await (ProductModel as any).findOneAndUpdate(
+        { id: numericId },
+        update,
+        { new: true, runValidators: true }
+      );
+    }
 
-    // If not found by numeric ID, try by MongoDB _id
-    if (!updatedProduct) {
-      updatedProduct = await ProductModel.findOneAndUpdate(
+    // If not found by numeric ID, try by MongoDB _id (if valid ObjectId)
+    if (!updatedProduct && Types.ObjectId.isValid(productId)) {
+      updatedProduct = await (ProductModel as any).findOneAndUpdate(
         { _id: productId },
         update,
         { new: true, runValidators: true }
@@ -87,8 +94,8 @@ export async function POST(request: NextRequest) {
 
     // If still not found, create a minimal product entry with just state
     if (!updatedProduct) {
-      const productData: any = {
-        id: parseInt(productId) || productId,
+      const productData: Record<string, any> = {
+        id: !isNaN(numericId) ? numericId : productId,
         name: `Product ${productId}`,
         price: 0,
         primaryImage: '/images/placeholder.jpg',
@@ -99,7 +106,7 @@ export async function POST(request: NextRequest) {
         isActive: isActive !== undefined ? isActive : true
       };
 
-      updatedProduct = await ProductModel.create(productData);
+      updatedProduct = await (ProductModel as any).create(productData);
     }
 
     return NextResponse.json({

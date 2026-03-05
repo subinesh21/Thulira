@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import ProductModel from '@/models/Product';
+import { Types } from 'mongoose';
 
 // PUT - Update product (Admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
+    // Await the params
+    const { id } = await params;
     const body = await request.json();
-    const productId = params.id;
 
-    // Update product
-    const updatedProduct = await ProductModel.findByIdAndUpdate(
-      productId,
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid product ID format' },
+        { status: 400 }
+      );
+    }
+
+    // Update product - using a type assertion to help TypeScript
+    const updatedProduct = await (ProductModel as any).findByIdAndUpdate(
+      id,
       {
         ...body,
         updatedAt: new Date()
@@ -52,15 +62,24 @@ export async function PUT(
 // DELETE - Remove product (Admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const productId = params.id;
+    // Await the params
+    const { id } = await params;
 
-    // Delete product
-    const deletedProduct = await ProductModel.findByIdAndDelete(productId);
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid product ID format' },
+        { status: 400 }
+      );
+    }
+
+    // Delete product - using a type assertion to help TypeScript
+    const deletedProduct = await (ProductModel as any).findByIdAndDelete(id);
 
     if (!deletedProduct) {
       return NextResponse.json(
@@ -72,7 +91,7 @@ export async function DELETE(
     return NextResponse.json({
       success: true,
       message: 'Product deleted successfully',
-      productId
+      productId: id
     });
 
   } catch (error: any) {

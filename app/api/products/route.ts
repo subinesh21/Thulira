@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import ProductModel from '@/models/Product';
+import { Types } from 'mongoose';
 
 // GET - Fetch products (with optional filters)
 export async function GET(request: NextRequest) {
@@ -22,12 +23,12 @@ export async function GET(request: NextRequest) {
       // Try to find by numeric id field first
       const numericId = parseInt(id);
       if (!isNaN(numericId)) {
-        product = await ProductModel.findOne({ id: numericId });
+        product = await (ProductModel as any).findOne({ id: numericId });
       }
       
       // If not found by numeric id, try by _id (ObjectId)
-      if (!product && id.match(/^[0-9a-fA-F]{24}$/)) {
-        product = await ProductModel.findById(id);
+      if (!product && Types.ObjectId.isValid(id)) {
+        product = await (ProductModel as any).findById(id);
       }
       
       if (product) {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build query for multiple products
-    const query: any = {};
+    const query: Record<string, any> = {};
 
     if (category) {
       query.category = category;
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch products
-    const products = await ProductModel.find(query).sort({ createdAt: -1 });
+    const products = await (ProductModel as any).find(query).sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create product
-    const product = await ProductModel.create(body);
+    const product = await (ProductModel as any).create(body);
 
     return NextResponse.json({
       success: true,
