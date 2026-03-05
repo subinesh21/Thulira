@@ -107,15 +107,20 @@ export default function Sidebar() {
         padding: '60px 40px 10px 40px',
         overflowY: 'auto'
       }}>
-        {/* Logo */}
-        <div style={{ marginBottom: '40px' }}>
-          <a href="/" style={{ fontSize: '30px', fontWeight: 'bold', color: '#131212' }}>
-            <span style={{ color: '#52dd28ff' }}>Thulira</span>
-          </a>
-          <p style={{ fontSize: '12px', color: '#6b6b6b', marginTop: '4px', marginLeft: '4px', letterSpacing: '3px' }}>
-            SUSTAINABLE LIVING
-          </p>
-        </div>
+      {/* Logo */}
+      <div style={{ marginBottom: '40px' }}>
+        <a href="/" style={{ display: 'block' }}>
+          <img 
+            src="/logo.png" 
+            alt="Thulira - Sustainable Living" 
+            style={{ 
+              maxWidth: '100%', 
+              height: 'auto',
+              display: 'block'
+            }} 
+          />
+        </a>
+      </div>
 
         {/* Navigation */}
         <nav style={{ marginBottom: '30px', marginLeft: '28px' }}>
