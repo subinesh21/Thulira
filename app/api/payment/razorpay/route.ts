@@ -153,7 +153,7 @@ export async function PUT(request: NextRequest) {
     // Here you would typically update your order collection
     // For now, we'll simulate the process
     
-    // Generate invoice
+    // Generate invoice number
     const invoiceNumber = InvoiceGenerator.generateInvoiceNumber();
     const orderDate = InvoiceGenerator.formatDate(new Date());
 
@@ -180,20 +180,16 @@ export async function PUT(request: NextRequest) {
       paymentId: razorpay_payment_id
     };
 
-    // Generate PDF invoice
-    const invoicePdf = await InvoiceGenerator.generateInvoicePDF(mockOrderData);
-
-    // Send invoice email
+    // Send order confirmation email (without PDF)
     const emailSent = await EmailService.sendInvoiceEmail(
       mockOrderData.customer.email,
       mockOrderData.customer.name,
       invoiceNumber,
-      invoicePdf,
       mockOrderData.totalAmount
     );
 
     if (!emailSent) {
-      console.warn('Failed to send invoice email');
+      console.warn('Failed to send order confirmation email');
     }
     
     return NextResponse.json({

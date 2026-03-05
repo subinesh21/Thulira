@@ -35,31 +35,19 @@ export class EmailService {
     customerEmail: string,
     customerName: string,
     orderId: string,
-    invoicePdf: Blob,
     orderTotal: number
   ): Promise<boolean> {
     try {
       const transporter = this.initializeTransporter();
 
-      // Convert Blob to Buffer
-      const arrayBuffer = await invoicePdf.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-
       const mailOptions: EmailOptions = {
         to: customerEmail,
-        subject: `Invoice for Order #${orderId} - Thulira Sustainable Products`,
-        html: this.generateInvoiceEmailTemplate(customerName, orderId, orderTotal),
-        attachments: [
-          {
-            filename: `Invoice_${orderId}.pdf`,
-            content: buffer,
-            contentType: 'application/pdf'
-          }
-        ]
+        subject: `Order Confirmation #${orderId} - Thulira Sustainable Products`,
+        html: this.generateInvoiceEmailTemplate(customerName, orderId, orderTotal)
       };
 
       const result = await transporter.sendMail(mailOptions);
-      console.log('Invoice email sent successfully:', result.messageId);
+      console.log('Order confirmation email sent successfully:', result.messageId);
       return true;
     } catch (error) {
       console.error('Error sending invoice email:', error);
