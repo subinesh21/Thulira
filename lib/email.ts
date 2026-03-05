@@ -6,9 +6,11 @@ interface EmailOptions {
   html: string;
 }
 
-// Create transporter
+// Create transporter for GoDaddy email
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.EMAIL_HOST || 'smtpout.secureserver.net',
+  port: parseInt(process.env.EMAIL_PORT || '465'),
+  secure: true, // true for 465, false for 587
   auth: {
     user: process.env.EMAIL_USER || '',
     pass: process.env.EMAIL_PASS || '',
@@ -27,7 +29,7 @@ transporter.verify((error, success) => {
 export async function sendEmail(options: EmailOptions) {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'noreply@yourapp.com',
+      from: `Thulira <${process.env.EMAIL_USER || 'kannabiran@thulira.com'}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
