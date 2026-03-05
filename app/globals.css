@@ -96,7 +96,6 @@
 /* Main layout wrapper - FIX for full width */
 .main-content-wrapper {
   min-height: 100vh;
-  
   margin-left: 280px; /* Same as sidebar width */
   float: right;
 }
@@ -116,6 +115,8 @@
   padding: 60px 40px 10px 40px;
   overflow-y: auto;
 }
+
+/* Note: Sidebar is hidden on mobile via the 'hidden lg:flex' class in the JSX */
 
 .amado-nav ul {
   list-style: none;
@@ -434,22 +435,10 @@
 
 /* Mobile Navigation - FIXED */
 @media (max-width: 991px) {
-  .amado-sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    width: 80%;
-    max-width: 280px;
-    height: 100vh;
-    z-index: 1001;
-  }
-  
-  .amado-sidebar.open {
-    transform: translateX(0);
-  }
+  /* Sidebar is completely hidden on mobile via hidden class */
   
   .main-content-wrapper {
     margin-left: 0;
-    
     float: none;
   }
   
@@ -464,23 +453,10 @@
 
 /* Extra small devices (phones, 600px and down) */
 @media (max-width: 575.98px) {
-  .amado-sidebar {
-    width: 100%;
-    max-width: 100%;
-  }
-  
-  .amado-nav ul li {
-    margin-bottom: 15px;
-  }
-  
   .amado-btn {
     min-width: 140px;
     height: 50px;
     padding: 0 20px;
-    font-size: 12px;
-  }
-  
-  .amado-nav ul li a {
     font-size: 12px;
   }
   

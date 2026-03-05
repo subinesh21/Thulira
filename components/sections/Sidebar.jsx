@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { Mail, Facebook, Twitter, Instagram, FileText } from 'lucide-react';
-import Image from 'next/image';
 
 const navItems = [
   { name: 'Home', href: '/' },
@@ -59,18 +58,11 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Nav */}
+      {/* Mobile Nav - This will be visible on mobile */}
       <div className="mobile-nav lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <div className="amado-navbar-brand">
-          <a href="/" className="block">
-            <Image 
-              src="/logo.png" 
-              alt="Thulira" 
-              width={120} 
-              height={40}
-              className="object-contain"
-              priority
-            />
+          <a href="/" className="text-2xl font-bold text-[#52dd28ff]">
+            <span className="text-[#52dd28ff]">Thulira</span>
           </a>
         </div>
         <button 
@@ -83,9 +75,9 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Sidebar */}
-      <header className={`amado-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-        {/* Close Icon - Mobile */}
+      {/* Sidebar - Hidden completely on mobile, visible only on desktop */}
+      <header className="amado-sidebar hidden lg:flex">
+        {/* Close Icon - Mobile (only visible when menu is open, but sidebar is hidden on mobile anyway) */}
         <div 
           className="nav-close absolute top-5 right-5 cursor-pointer lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
@@ -93,18 +85,12 @@ export default function Sidebar() {
           <i className="fa fa-close text-2xl text-[#6b6b6b] hover:text-[#52dd28ff] transition-colors"></i>
         </div>
 
-        {/* Logo - Image instead of text */}
+        {/* Logo - Increased bottom margin */}
         <div className="logo mb-40">
-          <a href="/" className="block">
-            <Image 
-              src="/logo.png" 
-              alt="Thulira - Sustainable Living" 
-              width={340} 
-              height={80}
-              className="object-contain"
-              priority
-            />
+          <a href="/" className="text-3xl font-bold text-[#131212]">
+            <span className="text-[#52dd28ff]">Thulira</span>
           </a>
+          <p className="text-xs text-[#6b6b6b] mt-1 ml-1 tracking-[3px]">SUSTAINABLE LIVING</p>
         </div>
 
         {/* Navigation - Increased bottom margin */}
@@ -170,7 +156,7 @@ export default function Sidebar() {
                 <i className="fa fa-user mr-4 text-[#52dd28ff]"></i>
                 Hi, {user?.name?.split(' ')[0]}
                 {user?.role === 'admin' && (
-                  <span className="ml-2 text-[10px] text-[#52dd28ff] px-1.5 py-0.5 rounded-full">Admin</span>
+                  <span className="ml-2 text-[10px] text-[#52dd28ff]  px-1.5 py-0.5 rounded-full">Admin</span>
                 )}
               </a>
               <button 
@@ -185,8 +171,7 @@ export default function Sidebar() {
             <a            
               href="/account" 
               className="flex items-center text-sm text-[#52dd28ff] hover:text-[#52dd28ff]"
-            > 
-              <i className="fa fa-user mr-4 text-[#52dd28ff] hover:text-[#52dd28ff]"></i>
+            > <i className="fa fa-user mr-4  text-[#52dd28ff] hover:text-[#52dd28ff]"></i>
               Account
             </a>
           )}
@@ -232,7 +217,7 @@ export default function Sidebar() {
         </div>
       </header>
 
-      {/* Overlay for mobile */}
+      {/* Overlay for mobile - only show when mobile menu is open */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"

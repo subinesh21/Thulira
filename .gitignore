@@ -156,3 +156,4 @@ logs/
 *.bak
 *.backup
 .vercel
+.env*.local
