@@ -10,6 +10,7 @@ import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import SEO from '@/components/SEO';
+import FAQAccordion from '@/components/FAQAccordion';
 import { generateProductSchema, generateBreadcrumbSchema } from '@/lib/schema-markup';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
@@ -482,12 +483,11 @@ export default function ProductDetailsPage() {
                     <span className="font-medium text-[#131212]">Category:</span>
                     <span className="text-[#6b6b6b] ml-1 sm:ml-2 capitalize">{product.category}</span>
                   </div>
-                  <div>
-                    <span className="font-medium text-[#131212]">Brand:</span>
-                    <span className="text-[#6b6b6b] ml-1 sm:ml-2 uppercase">{product.brand}</span>
-                  </div>
                 </div>
               </div>
+
+              {/* FAQ Section */}
+              <FAQAccordion faqs={product.faqs} />
             </div>
           </div>
         </div>

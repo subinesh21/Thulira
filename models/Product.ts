@@ -27,6 +27,16 @@ const productSchema = new mongoose.Schema({
     of: [String], // Color -> [image URLs]
     default: {}
   },
+  faqs: [{
+    question: {
+      type: String,
+      required: true
+    },
+    answer: {
+      type: String,
+      required: true
+    }
+  }],
   category: {
     type: String,
     required: true,

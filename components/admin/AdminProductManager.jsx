@@ -84,6 +84,7 @@ export default function AdminProductManager() {
     hoverImage: '',
     category: 'drinkware',
     colors: '',
+    faqs: [], // FAQ array
     inStock: true,
     description: '',
     rating: 4.5,
@@ -204,6 +205,7 @@ export default function AdminProductManager() {
       hoverImage: product.hoverImage || '',
       category: product.category,
       colors: product.colors.join(', '),
+      faqs: product.faqs || [],
       inStock: product.inStock,
       description: product.description,
       rating: product.rating.toString(),
@@ -293,8 +295,8 @@ export default function AdminProductManager() {
       primaryImage: '',
       hoverImage: '',
       category: 'drinkware',
-      brand: 'Thulira',
       colors: '',
+      faqs: [],
       inStock: true,
       description: '',
       rating: 4.5,
@@ -303,6 +305,29 @@ export default function AdminProductManager() {
     });
     setColorImages({});
     setShowColorImages(false);
+  };
+
+  // FAQ Management Functions
+  const addFAQ = () => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: [...prev.faqs, { question: '', answer: '' }]
+    }));
+  };
+
+  const removeFAQ = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateFAQ = (index, field, value) => {
+    setFormData(prev => {
+      const newFaqs = [...prev.faqs];
+      newFaqs[index] = { ...newFaqs[index], [field]: value };
+      return { ...prev, faqs: newFaqs };
+    });
   };
 
   const cancelForm = () => {
@@ -551,6 +576,72 @@ export default function AdminProductManager() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
+            </div>
+
+            {/* FAQ Section */}
+            <div className="md:col-span-2">
+              <div className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-800">Product FAQs</h3>
+                  <button
+                    type="button"
+                    onClick={addFAQ}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                  >
+                    Add FAQ
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {formData.faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-100 rounded-lg p-4 relative">
+                      <button
+                        type="button"
+                        onClick={() => removeFAQ(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Question *
+                          </label>
+                          <input
+                            type="text"
+                            value={faq.question}
+                            onChange={(e) => updateFAQ(index, 'question', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Enter frequently asked question"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Answer *
+                          </label>
+                          <textarea
+                            value={faq.answer}
+                            onChange={(e) => updateFAQ(index, 'answer', e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Enter detailed answer"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {formData.faqs.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No FAQs added yet. Click "Add FAQ" to get started.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Color Images Section */}
