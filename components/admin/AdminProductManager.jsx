@@ -99,7 +99,7 @@ export default function AdminProductManager() {
       setLoading(true);
       const response = await fetch('/api/products');
       const data = await response.json();
-      
+
       if (data.success) {
         setProducts(data.products || []);
       } else {
@@ -130,16 +130,16 @@ export default function AdminProductManager() {
   const handleImageUpload = async (e, fieldName, colorName = null) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     setUploading(true);
-    
+
     try {
       let imageUrl;
-      
+
       if (colorName) {
         // Handle color-specific image upload
         imageUrl = await uploadProductImage(file, 'temp', `color_${colorName}`);
-        
+
         setColorImages(prev => {
           const currentImages = prev[colorName] || [];
           return {
@@ -151,13 +151,13 @@ export default function AdminProductManager() {
         // Handle regular field image upload
         const productId = expandedProduct === 'new' ? 'new_product' : expandedProduct;
         imageUrl = await uploadProductImage(file, productId, fieldName);
-        
+
         setFormData(prev => ({
           ...prev,
           [fieldName]: imageUrl
         }));
       }
-      
+
       toast.success(`${colorName ? `${colorName} image` : fieldName} uploaded successfully to Firebase!`);
     } catch (error) {
       console.error('Upload error:', error);
@@ -169,12 +169,12 @@ export default function AdminProductManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       const isUpdate = expandedProduct && expandedProduct !== 'new';
       const url = isUpdate ? `/api/admin/products/${expandedProduct}` : '/api/admin/products';
       const method = isUpdate ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -191,7 +191,7 @@ export default function AdminProductManager() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         toast.success(isUpdate ? 'Product updated successfully' : 'Product created successfully');
         setExpandedProduct(null);
@@ -236,14 +236,14 @@ export default function AdminProductManager() {
 
   const handleDelete = async (productId) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
-    
+
     try {
       const response = await fetch(`/api/admin/products/${productId}`, {
         method: 'DELETE'
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         toast.success('Product deleted successfully');
         fetchProducts();
@@ -259,16 +259,16 @@ export default function AdminProductManager() {
   const handleToggleStock = async (product) => {
     try {
       const newStockStatus = !product.inStock;
-      
+
       // Update full product in MongoDB
       const response = await fetch(`/api/admin/products/${product._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inStock: newStockStatus })
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         toast.success(`Product marked as ${newStockStatus ? 'in stock' : 'out of stock'}`);
         fetchProducts();
@@ -284,16 +284,16 @@ export default function AdminProductManager() {
   const handleToggleVisibility = async (product) => {
     try {
       const newVisibility = !product.isActive;
-      
+
       // Update full product in MongoDB
       const response = await fetch(`/api/admin/products/${product._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: newVisibility })
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         toast.success(`Product ${newVisibility ? 'published' : 'hidden'}`);
         fetchProducts();
@@ -386,7 +386,7 @@ export default function AdminProductManager() {
               {isAddingNew ? 'Add New Product' : 'Edit Product'}
             </h2>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
@@ -452,9 +452,9 @@ export default function AdminProductManager() {
               </div>
               {formData.primaryImage && (
                 <div className="mt-2">
-                  <img 
-                    src={formData.primaryImage} 
-                    alt="Preview" 
+                  <img
+                    src={formData.primaryImage}
+                    alt="Preview"
                     className="h-20 w-20 object-cover rounded-md border"
                   />
                 </div>
@@ -487,9 +487,9 @@ export default function AdminProductManager() {
               </div>
               {formData.hoverImage && (
                 <div className="mt-2">
-                  <img 
-                    src={formData.hoverImage} 
-                    alt="Preview" 
+                  <img
+                    src={formData.hoverImage}
+                    alt="Preview"
                     className="h-20 w-20 object-cover rounded-md border"
                   />
                 </div>
@@ -519,9 +519,9 @@ export default function AdminProductManager() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Colors</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-3">
                 {[
-                  'Azure', 'Celeste', 'Charcoal', 'Coffee', 'Coral', 'Fern', 
+                  'Azure', 'Celeste', 'Charcoal', 'Coffee', 'Coral', 'Fern',
                   'Sand Castle', 'Innocent', 'Pink', 'Blue', 'Green', 'White',
-                  'Black', 'Natural', 'Walnut', 'Bamboo', 'Natural Wood', 
+                  'Black', 'Natural', 'Walnut', 'Bamboo', 'Natural Wood',
                   'Terracotta', 'Multi'
                 ].map((color) => (
                   <label key={color} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
@@ -610,7 +610,7 @@ export default function AdminProductManager() {
                     Add FAQ
                   </button>
                 </div>
-                
+
                 <div className="space-y-4">
                   {formData.faqs.map((faq, index) => (
                     <div key={index} className="border border-gray-100 rounded-lg p-4 relative">
@@ -621,7 +621,7 @@ export default function AdminProductManager() {
                       >
                         ×
                       </button>
-                      
+
                       <div className="space-y-3">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -636,7 +636,7 @@ export default function AdminProductManager() {
                             required
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Answer *
@@ -653,7 +653,7 @@ export default function AdminProductManager() {
                       </div>
                     </div>
                   ))}
-                  
+
                   {formData.faqs.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
                       <p>No FAQs added yet. Click "Add FAQ" to get started.</p>
@@ -677,19 +677,19 @@ export default function AdminProductManager() {
                       {showColorImages ? 'Hide' : 'Show'} Color Image Upload
                     </button>
                   </div>
-                  
+
                   {showColorImages && (
                     <div className="space-y-6">
                       {formData.colors.split(',').map(color => color.trim()).filter(color => color).map((color) => (
                         <div key={color} className="border border-gray-100 rounded-lg p-4">
                           <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
-                            <div 
+                            <div
                               className="w-4 h-4 rounded-full border"
                               style={{ backgroundColor: getColorCode(color) }}
                             />
                             {color} Images (Max 3)
                           </h4>
-                          
+
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                             {Array.from({ length: 3 }).map((_, index) => (
                               <div key={index} className="space-y-2">
@@ -724,8 +724,8 @@ export default function AdminProductManager() {
                                 </div>
                                 {colorImages[color] && colorImages[color][index] && (
                                   <div className="relative">
-                                    <img 
-                                      src={colorImages[color][index]} 
+                                    <img
+                                      src={colorImages[color][index]}
                                       alt={`${color} image ${index + 1}`}
                                       className="w-full h-20 object-cover rounded border"
                                     />
@@ -746,7 +746,7 @@ export default function AdminProductManager() {
                               </div>
                             ))}
                           </div>
-                          
+
                           {colorImages[color] && colorImages[color].length > 0 && (
                             <div className="text-sm text-gray-600">
                               Uploaded {colorImages[color].length} of 3 images
@@ -771,7 +771,7 @@ export default function AdminProductManager() {
                 />
                 <span className="ml-2 text-sm text-gray-700">In Stock</span>
               </label>
-              
+
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -802,7 +802,7 @@ export default function AdminProductManager() {
                   isAddingNew ? 'Create Product' : 'Update Product'
                 )}
               </button>
-              
+
               <button
                 type="button"
                 onClick={cancelForm}
@@ -820,7 +820,7 @@ export default function AdminProductManager() {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">All Products ({products.length})</h2>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -857,60 +857,52 @@ export default function AdminProductManager() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.inStock 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.inStock
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}>
                       {product.inStock ? 'In Stock' : 'Out of Stock'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.isActive 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.isActive
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {product.isActive ? 'Published' : 'Hidden'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex flex-col items-end space-y-3">
+                    <div className="flex items-center justify-end gap-3">
                       <button
                         onClick={() => handleEdit(product)}
-                        className="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-full transition-colors"
-                        title="Edit Product"
+                        className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
                       >
-                        <EditIcon />
+                        Edit
                       </button>
                       <button
                         onClick={() => handleToggleStock(product)}
-                        className={`p-2 ${
-                          product.inStock 
-                            ? 'text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50' 
-                            : 'text-green-600 hover:text-green-900 hover:bg-green-50'
-                        } rounded-full transition-colors`}
-                        title={product.inStock ? 'Mark as Out of Stock' : 'Mark as In Stock'}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${product.inStock
+                            ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100'
+                            : 'text-green-700 bg-green-50 hover:bg-green-100'
+                          }`}
                       >
-                        <InventoryIcon />
+                        {product.inStock ? 'Unstock' : 'Restock'}
                       </button>
                       <button
                         onClick={() => handleToggleVisibility(product)}
-                        className={`p-2 ${
-                          product.isActive 
-                            ? 'text-blue-600 hover:text-blue-900 hover:bg-blue-50' 
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                        } rounded-full transition-colors`}
-                        title={product.isActive ? 'Hide Product' : 'Show Product'}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${product.isActive
+                            ? 'text-blue-700 bg-blue-50 hover:bg-blue-100'
+                            : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                          }`}
                       >
-                        {product.isActive ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                        {product.isActive ? 'Hide' : 'Show'}
                       </button>
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
-                        title="Delete Product"
+                        className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
                       >
-                        <DeleteIcon />
+                        Delete
                       </button>
                     </div>
                   </td>

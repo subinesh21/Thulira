@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Mail, Facebook, Twitter, Instagram, FileText, Search, ShoppingCart, User, LogIn, ChevronDown, XCircle } from 'lucide-react';
+import { Menu, X, Mail, Facebook, Twitter, Instagram, FileText, Search, ShoppingCart, User, LogIn, ChevronDown, XCircle, Heart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 
@@ -11,6 +11,8 @@ const navItems = [
   { name: 'Home', href: '/' },
   { name: 'Products', href: '/products' },
   { name: 'Shop', href: '/shop' },
+  { name: 'Wishlist', href: '/wishlist' },
+  { name: 'Blogs', href: '/blogs' },
   { name: 'Cart', href: '/cart' },
 ];
 
@@ -41,8 +43,8 @@ export default function MobileNav() {
   useEffect(() => {
     function handleClickOutside(event) {
       // Close dropdown when clicking outside
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
-          menuButtonRef.current && !menuButtonRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+        menuButtonRef.current && !menuButtonRef.current.contains(event.target)) {
         setIsOpen(false);
       }
       // Close search when clicking outside search bar
@@ -82,7 +84,7 @@ export default function MobileNav() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden shadow-sm h-15">
         {/* Left side - Menu button and Logo */}
         <div className="flex items-center gap-2">
-          <button 
+          <button
             ref={menuButtonRef}
             onClick={toggleMenu}
             className="hover:bg-gray-100 rounded-lg transition-colors relative p-2"
@@ -91,7 +93,7 @@ export default function MobileNav() {
             <Menu className="w-6 h-6 text-gray-600" />
 
           </button>
-          <Link href="/" className="text-2xl font-bold">
+          <Link href="/" className="text-2xl font-bold" style={{ fontFamily: 'var(--font-cinzel), serif', letterSpacing: '1px' }}>
             <span className="text-[#52dd28ff]">Thulira</span>
           </Link>
         </div>
@@ -101,15 +103,15 @@ export default function MobileNav() {
           {/* Search Button */}
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="relative p-2 hover:bg-gray-100 rounded-box transition-colors"
             aria-label="Search"
           >
             <Search className="w-5 h-5 text-gray-600" />
           </button>
 
           {/* Account Button - Always person icon */}
-          <Link 
-            href="/account" 
+          <Link
+            href="/account"
             className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
             aria-label="Account"
           >
@@ -117,8 +119,8 @@ export default function MobileNav() {
           </Link>
 
           {/* Cart Button with Count */}
-          <Link 
-            href="/cart" 
+          <Link
+            href="/cart"
             className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
             aria-label="Cart"
           >
@@ -133,11 +135,10 @@ export default function MobileNav() {
       </div>
 
       {/* Centered Search Bar - Appears below top bar */}
-      <div 
+      <div
         ref={searchBarRef}
-        className={`fixed left-0 right-0 z-45 lg:hidden transform transition-all duration-300 ease-in-out ${
-          showSearch ? 'top-[73px] opacity-100' : '-top-20 opacity-0 pointer-events-none'
-        }`}
+        className={`fixed left-0 right-0 z-45 lg:hidden transform transition-all duration-300 ease-in-out ${showSearch ? 'top-[73px] opacity-100' : '-top-20 opacity-0 pointer-events-none'
+          }`}
       >
         <div className="bg-white py-3 px-4 border-b border-gray-200">
           <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
@@ -162,7 +163,7 @@ export default function MobileNav() {
               )}
               <button
                 type="submit"
-                className="p-1.5 bg-[#52dd28ff] text-white rounded-full hover:bg-[#45b824] transition-colors flex items-center justify-center"
+                className="p-1.5 bg-[#52dd28ff] text-white rounded-circle hover:bg-[#45b824] transition-colors flex items-center justify-center"
                 aria-label="Search"
               >
                 <Search className="w-3.5 h-3.5" />
@@ -173,14 +174,13 @@ export default function MobileNav() {
       </div>
 
       {/* Dropdown Menu - Opens from top */}
-      <div 
+      <div
         ref={dropdownRef}
-        className={`fixed top-[73px] left-0 right-0 z-40 lg:hidden transform transition-all duration-300 ease-in-out pr-50 ${
-          isOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0 pointer-events-none'
-        }`}
+        className={`fixed top-[73px] left-0 right-0 z-40 lg:hidden transform transition-all duration-300 ease-in-out pr-50 ${isOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0 pointer-events-none'
+          }`}
       >
 
-         <div className="bg-white border border-gray-20 shadow-lg rounded-lg mx-4 overflow-hidden ">
+        <div className="bg-white border border-gray-20 shadow-lg rounded-lg mx-4 overflow-hidden ">
           {/* Navigation Links - More compact */}
           <nav className="py-2 ">
             <ul className="divide-y divide-gray-300 mr-8">
@@ -189,19 +189,17 @@ export default function MobileNav() {
                   <Link
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center justify-between px-3 py-2.5 transition-all duration-200${
-                      pathname === item.href 
-                        ? 'bg text-gray-60 font-medium' 
-                        : 'text-gray-70 hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center justify-between px-3 py-2.5 transition-all duration-200${pathname === item.href
+                      ? 'bg text-gray-60 font-medium'
+                      : 'text-gray-70 hover:bg-gray-50'
+                      }`}
                   >
                     <span className="text-sm text-[#131212] hover:text-[#52dd28ff] mr-9">{item.name}</span>
                     {item.name === 'Cart' && cartCount > 0 && (
-                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
-                        pathname === item.href 
-                          ? 'bg-gray-60 text-white' 
-                          : 'bg-[#52dd28ff] text-white'
-                      }`}>
+                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${pathname === item.href
+                        ? 'bg-gray-60 text-white'
+                        : 'bg-[#52dd28ff] text-white'
+                        }`}>
                         {cartCount}
                       </span>
                     )}
@@ -225,16 +223,16 @@ export default function MobileNav() {
         {/* User Info - Desktop */}
         <div className="mb-8 ml-2">
           {isAuthenticated ? (
-            <Link 
-              href="/account" 
+            <Link
+              href="/account"
               className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#52dd28ff] transition-colors group"
             >
               <User className="w-5 h-5 text-gray-500 group-hover:text-[#52dd28ff]" />
               <span className="font-medium">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
             </Link>
           ) : (
-            <Link 
-              href="/account" 
+            <Link
+              href="/account"
               className="flex items-center gap-3 text-sm text-gray-700 hover:text-[#52dd28ff] transition-colors group"
             >
               <User className="w-5 h-5 text-gray-500 group-hover:text-[#52dd28ff]" />
@@ -249,11 +247,10 @@ export default function MobileNav() {
               <li key={item.name}>
                 <Link
                   href={item.href}
-                  className={`text-sm uppercase font-semibold tracking-wider transition-colors relative block ${
-                    pathname === item.href 
-                      ? 'text-[#52dd28ff]' 
-                      : 'text-gray-700 hover:text-[#52dd28ff]'
-                  }`}
+                  className={`text-sm uppercase font-semibold tracking-wider transition-colors relative block ${pathname === item.href
+                    ? 'text-[#52dd28ff]'
+                    : 'text-gray-700 hover:text-[#52dd28ff]'
+                    }`}
                 >
                   {item.name === 'Cart' ? `${item.name} (${cartCount})` : item.name}
                 </Link>
@@ -288,9 +285,9 @@ export default function MobileNav() {
         <div className="mt-auto">
           <div className="social-info flex justify-between pt-4 border-t border-gray-200">
             {[Mail, Facebook, Twitter, Instagram].map((Icon, i) => (
-              <a 
-                key={i} 
-                href="#" 
+              <a
+                key={i}
+                href="#"
                 className="text-gray-500 hover:text-[#52dd28ff] transition-colors"
               >
                 <Icon className="w-5 h-5" />

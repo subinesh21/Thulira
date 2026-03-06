@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Package, Eye, EyeOff, Trash2, AlertTriangle, CheckCircle, 
-  Search, Filter, X, ChevronLeft, ChevronRight 
+import {
+  Package, Eye, EyeOff, Trash2, AlertTriangle, CheckCircle,
+  Search, Filter, X, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { toast } from 'react-toastify';
@@ -29,7 +29,7 @@ export default function AdminProductsPage() {
       setLoading(true);
       const response = await fetch('/api/products');
       const data = await response.json();
-      
+
       if (data.success) {
         setProducts(data.products || []);
       } else {
@@ -53,18 +53,18 @@ export default function AdminProductsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         // Refresh products list
         await fetchProducts();
-        
-        const action = updates.isRemoved ? 'removed' : 
-                      !updates.isActive ? 'hidden' : 
-                      !updates.inStock ? 'marked out of stock' :
-                      'restored';
-        
+
+        const action = updates.isRemoved ? 'removed' :
+          !updates.isActive ? 'hidden' :
+            !updates.inStock ? 'marked out of stock' :
+              'restored';
+
         toast.success(`Product ${action} successfully`);
       } else {
         toast.error(data.message || 'Failed to update product');
@@ -93,7 +93,7 @@ export default function AdminProductsPage() {
   };
 
   const handleRestore = (productId) => {
-    updateProduct(productId, { 
+    updateProduct(productId, {
       isRemoved: false,
       isActive: true,
       inStock: true
@@ -103,10 +103,10 @@ export default function AdminProductsPage() {
   // Filter products based on direct Product collection fields
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product._id.toString().includes(searchTerm);
-    
+      product._id.toString().includes(searchTerm);
+
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
-    
+
     let matchesStatus = true;
     if (filterStatus === 'active') {
       matchesStatus = product.isActive && product.inStock && !product.isRemoved;
@@ -117,7 +117,7 @@ export default function AdminProductsPage() {
     } else if (filterStatus === 'removed') {
       matchesStatus = product.isRemoved;
     }
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -288,51 +288,49 @@ export default function AdminProductsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                      <div className="flex justify-end gap-4">
                         {product.isRemoved ? (
                           <button
                             onClick={() => handleRestore(product._id)}
-                            className="text-green-600 hover:text-green-900 flex items-center"
+                            className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-full transition-colors"
                             title="Restore product"
                           >
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle className="w-5 h-5" />
                           </button>
                         ) : (
                           <>
                             <button
                               onClick={() => handleToggleVisibility(product._id, product.isActive)}
-                              className={`${
-                                product.isActive 
-                                  ? 'text-gray-600 hover:text-gray-900' 
-                                  : 'text-blue-600 hover:text-blue-900'
-                              } flex items-center`}
+                              className={`p-2 rounded-full transition-colors ${product.isActive
+                                  ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                                  : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                                }`}
                               title={product.isActive ? 'Hide product' : 'Show product'}
                             >
                               {product.isActive ? (
-                                <EyeOff className="w-4 h-4" />
+                                <EyeOff className="w-5 h-5" />
                               ) : (
-                                <Eye className="w-4 h-4" />
+                                <Eye className="w-5 h-5" />
                               )}
                             </button>
-                            
+
                             <button
                               onClick={() => handleToggleStock(product._id, product.inStock)}
-                              className={`${
-                                product.inStock 
-                                  ? 'text-yellow-600 hover:text-yellow-900' 
-                                  : 'text-green-600 hover:text-green-900'
-                              } flex items-center`}
+                              className={`p-2 rounded-full transition-colors ${product.inStock
+                                  ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
+                                  : 'text-green-600 hover:text-green-800 hover:bg-green-50'
+                                }`}
                               title={product.inStock ? 'Mark out of stock' : 'Mark in stock'}
                             >
-                              <AlertTriangle className="w-4 h-4" />
+                              <AlertTriangle className="w-5 h-5" />
                             </button>
-                            
+
                             <button
                               onClick={() => handleRemove(product._id)}
-                              className="text-red-600 hover:text-red-900 flex items-center"
+                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
                               title="Remove product"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-5 h-5" />
                             </button>
                           </>
                         )}

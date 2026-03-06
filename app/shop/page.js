@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Filter, ChevronLeft, ChevronRight, LayoutGrid, List } from 'lucide-react';
 import Sidebar from '@/components/sections/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
@@ -62,11 +62,12 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  
+  const [viewMode, setViewMode] = useState('grid');
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  
+
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedColors, setSelectedColors] = useState([]);
@@ -100,7 +101,7 @@ export default function ShopPage() {
         setLoading(false);
       }
     };
-    
+
     fetchProducts();
   }, []);
 
@@ -116,7 +117,7 @@ export default function ShopPage() {
 
       // Filter by colors
       if (selectedColors.length > 0) {
-        filtered = filtered.filter(p => 
+        filtered = filtered.filter(p =>
           p.colors && p.colors.some(color => selectedColors.includes(color))
         );
       }
@@ -148,7 +149,7 @@ export default function ShopPage() {
       }
 
       const total = Math.ceil(filtered.length / PRODUCTS_PER_PAGE);
-      
+
       setFilteredProducts(filtered);
       setTotalPages(total);
       setCurrentPage(1);
@@ -179,8 +180,8 @@ export default function ShopPage() {
   };
 
   const toggleColor = (colorName) => {
-    setSelectedColors(prev => 
-      prev.includes(colorName) 
+    setSelectedColors(prev =>
+      prev.includes(colorName)
         ? prev.filter(c => c !== colorName)
         : [...prev, colorName]
     );
@@ -258,11 +259,10 @@ export default function ShopPage() {
                       <button
                         key={c.id}
                         onClick={() => setSelectedCategory(c.id)}
-                        className={`px-3 py-1.5 text-xs border rounded-box transition-colors w-100 ${
-                          selectedCategory === c.id
+                        className={`px-3 py-1.5 text-xs border rounded-box transition-colors w-100 ${selectedCategory === c.id
                             ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
                             : 'bg-background text-muted-foreground border-border hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
-                        }`}
+                          }`}
                       >
                         {c.name}
                       </button>
@@ -337,18 +337,37 @@ export default function ShopPage() {
                 </div>
               ) : (
                 <>
-                  {/* Products count */}
+                  {/* Products count + View toggle */}
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs text-muted-foreground">
                       Showing {filteredProducts.length > 0 ? (currentPage - 1) * PRODUCTS_PER_PAGE + 1 : 0} - {Math.min(currentPage * PRODUCTS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length}
                     </p>
-                    <p className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                      Page {currentPage}/{totalPages || 1}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        className={`p-1.5 rounded transition-colors ${viewMode === 'grid' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
+                        title="Grid View"
+                      >
+                        <LayoutGrid className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode('list')}
+                        className={`p-1.5 rounded transition-colors ${viewMode === 'list' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
+                        title="List View"
+                      >
+                        <List className="w-4 h-4" />
+                      </button>
+                      <p className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full ml-1">
+                        Page {currentPage}/{totalPages || 1}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Products grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-8">
+                  {/* Products grid/list */}
+                  <div className={viewMode === 'grid'
+                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-8"
+                    : "flex flex-col gap-3 sm:gap-4 mb-8"
+                  }>
                     {paginatedProducts.map((product, i) => (
                       <motion.div
                         key={product._id || product.id}
@@ -359,6 +378,7 @@ export default function ShopPage() {
                         <ProductCard
                           product={product}
                           categoryImage={CATEGORY_INFO[product.category]?.image}
+                          viewMode={viewMode}
                         />
                       </motion.div>
                     ))}
@@ -379,11 +399,10 @@ export default function ShopPage() {
                         <button
                           key={p}
                           onClick={() => handlePageChange(p)}
-                          className={`px-3 py-1 border text-sm rounded transition-colors ${
-                            currentPage === p
+                          className={`px-3 py-1 border text-sm rounded transition-colors ${currentPage === p
                               ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
                               : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
-                          }`}
+                            }`}
                         >
                           {p}
                         </button>

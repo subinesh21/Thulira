@@ -13,10 +13,12 @@
     "seed:cli": "node scripts/seed-cli.js"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.5.0",
     "@mui/material": "^6.3.1",
+    "@mui/material-nextjs": "^7.3.9",
     "@types/bcryptjs": "^2.4.6",
     "@types/nodemailer": "^6.4.17",
     "axios": "^1.7.9",
@@ -37,6 +39,7 @@
     "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-icons": "^5.6.0",
     "react-toastify": "^10.0.6",
     "stripe": "^20.4.0"
   },

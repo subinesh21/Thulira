@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { Mail, Facebook, Twitter, Instagram, FileText } from 'lucide-react';
+import { Mail, Facebook, Twitter, Instagram, FileText, User, Heart, Search } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const navItems = [
   { name: 'Home', href: '/' },
-  { name: 'Products', href: 'products' },
+  { name: 'Products', href: '/products' },
   { name: 'Shop', href: '/shop' },
   { name: 'Cart', href: '/cart' },
 ];
@@ -16,7 +17,10 @@ const navItems = [
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
+  const router = useRouter();
   const { cartCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -25,10 +29,10 @@ export default function Sidebar() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 992);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -69,7 +73,7 @@ export default function Sidebar() {
               <span className="text-[#52dd28ff]">Thulira</span>
             </a>
           </div>
-          <button 
+          <button
             className="amado-navbar-toggler flex flex-col gap-1 p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -81,7 +85,7 @@ export default function Sidebar() {
 
         {/* Mobile Menu Overlay - This would be your separate mobile nav component */}
         {isMobileMenuOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
@@ -101,185 +105,252 @@ export default function Sidebar() {
         left: 0,
         backgroundColor: '#fff',
         borderRight: '1px solid #ebebeb',
+        boxShadow: 'none',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
-        padding: '60px 40px 10px 40px',
-        overflowY: 'auto'
+        justifyContent: 'space-between',
+        padding: '0px 40px 20px 40px',
+        overflow: 'hidden',
+        height: '100vh'
       }}>
-      {/* Logo */}
-      <div style={{ marginBottom: '40px' }}>
-        <a href="/" style={{ display: 'block' }}>
-          <img 
-            src="/logo.png" 
-            alt="Thulira - Sustainable Living" 
-            style={{ 
-              maxWidth: '100%', 
-              height: 'auto',
-              display: 'block'
-            }} 
-          />
-        </a>
-      </div>
 
-        {/* Navigation */}
-        <nav style={{ marginBottom: '30px', marginLeft: '28px' }}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {navItems.map((item) => (
-              <li key={item.name} style={{ marginBottom: '30px' }}>
-                <a 
-                  href={item.href}
-                  style={{
-                    fontSize: '14px',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                    color: pathname === item.href ? '#52dd28ff' : '#131212',
-                    letterSpacing: '1px',
-                    transition: 'all 0.3s ease',
-                    display: 'inline-block',
-                    position: 'relative',
-                    textDecoration: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#52dd28ff';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (pathname !== item.href) {
-                      e.currentTarget.style.color = '#131212';
-                    }
-                  }}
-                >
-                  {item.name === 'Cart' ? `${item.name} (${cartCount})` : item.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        {/* Blogs Button */}
-        <div style={{ marginBottom: '16px', marginLeft: '16px' }}>
-          <a 
-            href="/blogs" 
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              textAlign: 'left',
-              textDecoration: 'none'
-            }}
-          >
-            <FileText style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b' }} />
-            <span style={{ fontSize: '14px', fontWeight: 500, color: '#131212' }}>
-              Blogs
-            </span>
+        {/* Top Section: Logo */}
+        <div style={{ flexShrink: 0 }}>
+          <a href="/" style={{ display: 'block' }}>
+            <img
+              src="/logo.png"
+              alt="Thulira - Sustainable Living"
+              style={{
+                maxWidth: '100%',
+                height: '160px',
+                display: 'block'
+              }}
+            />
           </a>
         </div>
 
-        {/* Search Section */}
-        <div style={{ marginBottom: '24px', marginLeft: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-            <i className="fa fa-search" style={{ marginRight: '16px', color: '#6b6b6b' }}></i>
-            <span style={{ fontSize: '14px', fontWeight: 500, color: '#131212' }}>Search</span>
-          </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              console.log('Search submitted');
-            }}
-          >
-            <input 
-              type="search" 
-              placeholder="Type your keyword..."
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                border: '1px solid #ebebeb',
-                fontSize: '14px',
-                outline: 'none'
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#52dd28ff';
-                e.currentTarget.style.boxShadow = '0 0 0 1px #52dd28ff';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#ebebeb';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            />
-          </form>
-        </div>
+        {/* Middle Section: Navigation + Search + Blogs (takes remaining space) */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 0 }}>
+          {/* Navigation */}
+          <nav style={{ marginLeft: '28px', paddingTop: '10px' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {navItems.map((item) => (
+                <li key={item.name} style={{ marginBottom: 'clamp(10px, 2.5vh, 30px)' }}>
+                  <a
+                    href={item.href}
+                    style={{
+                      fontFamily: 'var(--font-cinzel), serif',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      fontWeight: 600,
+                      color: pathname === item.href ? '#52dd28ff' : '#131212',
+                      letterSpacing: '2px',
+                      transition: 'all 0.3s ease',
+                      display: 'inline-block',
+                      position: 'relative',
+                      textDecoration: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#52dd28ff';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (pathname !== item.href) {
+                        e.currentTarget.style.color = '#131212';
+                      }
+                    }}
+                  >
+                    {item.name === 'Cart' ? `${item.name} (${cartCount})` : item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-        {/* Account Section */}
-        <div style={{ paddingTop: '24px', paddingBottom: '24px', marginLeft: '16px', borderTop: '1px solid #ebebeb' }}>
-          {isAuthenticated ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <a 
-                href={getAccountLink()}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  color: '#52dd28ff',
-                  textDecoration: 'none'
+          {/* Search Section */}
+          <div style={{ marginTop: 'clamp(82px, 2vh, 24px)', marginLeft: '16px', marginBottom: 'clamp(8px, 1.5vh, 24px)', minHeight: '44px' }}>
+            {!isSearchActive ? (
+              <div
+                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '10px 0' }}
+                onClick={() => setIsSearchActive(true)}
+              >
+                <Search style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b' }} />
+                <span className="search-text-hover" style={{ fontSize: '14px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Search</span>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                    setIsSearchActive(false);
+                    setSearchQuery('');
+                  }
                 }}
               >
-                <i className="fa fa-user" style={{ marginRight: '16px', color: '#52dd28ff' }}></i>
-                Hi, {user?.name?.split(' ')[0]}
-                {user?.role === 'admin' && (
-                  <span style={{ marginLeft: '8px', fontSize: '10px', color: '#52dd28ff', padding: '2px 6px', borderRadius: '999px' }}>Admin</span>
-                )}
-              </a>
-              <button 
-                onClick={logout}
+                <input
+                  type="search"
+                  placeholder="Type your keyword..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '10px 16px',
+                    border: '1px solid #ebebeb',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#52dd28ff';
+                    e.currentTarget.style.boxShadow = '0 0 0 1px #52dd28ff';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#ebebeb';
+                    e.currentTarget.style.boxShadow = 'none';
+                    if (!searchQuery.trim()) {
+                      setIsSearchActive(false);
+                    }
+                  }}
+                />
+              </form>
+            )}
+          </div>
+
+          {/* Blogs Button */}
+          <div style={{ marginLeft: '16px' }}>
+            <a
+              href="/blogs"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                textAlign: 'left',
+                textDecoration: 'none'
+              }}
+            >
+              <FileText style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b' }} />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#131212' }}>
+                Blogs
+              </span>
+            </a>
+          </div>
+
+          {/* Wishlist Button */}
+          <div style={{ marginLeft: '16px', marginTop: '12px' }}>
+            <a
+              href="/wishlist"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                textAlign: 'left',
+                textDecoration: 'none'
+              }}
+            >
+              <Heart style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b' }} />
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#131212' }}>
+                Wishlist
+              </span>
+            </a>
+          </div>
+        </div>
+
+        {/* Bottom Section: Account + Social (always pinned to bottom) */}
+        <div style={{ flexShrink: 0 }}>
+          {/* Account Section */}
+          <div style={{ paddingTop: '16px', paddingBottom: '16px', marginLeft: '16px', borderTop: '1px solid #ebebeb' }}>
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <a
+                  href={getAccountLink()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#52dd28ff',
+                    textDecoration: 'none'
+                  }}
+                >
+                  <i className="fa fa-user" style={{ marginRight: '16px', color: '#52dd28ff' }}></i>
+                  Hi, {user?.name?.split(' ')[0]}
+                  {user?.role === 'admin' && (
+                    <span style={{ marginLeft: '8px', fontSize: '10px', color: '#52dd28ff', padding: '2px 6px', borderRadius: '999px' }}>Admin</span>
+                  )}
+                </a>
+                <button
+                  className="logout-btn"
+                  onClick={logout}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '14px',
+                    color: '#353232ff',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    transition: 'color 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#ff0000';
+                    const icon = e.currentTarget.querySelector('i');
+                    if (icon) icon.style.color = '#ff0000';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#353232ff';
+                    const icon = e.currentTarget.querySelector('i');
+                    if (icon) icon.style.color = '';
+                  }}
+                >
+                  <i className="fa fa-sign-out" style={{ marginRight: '16px', transition: 'color 0.3s ease' }}></i>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <a
+                href="/account"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   fontSize: '14px',
-                  color: '#131212',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0
+                  color: '#52dd28ff',
+                  textDecoration: 'none'
                 }}
               >
-                <i className="fa fa-sign-out" style={{ marginRight: '16px' }}></i>
-                Logout
-              </button>
-            </div>
-          ) : (
-            <a            
-              href="/account" 
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                fontSize: '14px',
-                color: '#52dd28ff',
-                textDecoration: 'none'
-              }}
-            >
-              <i className="fa fa-user" style={{ marginRight: '16px', color: '#52dd28ff' }}></i>
-              Account
+                <User style={{ width: '18px', height: '18px', marginRight: '12px', color: '#52dd28ff' }} />
+                Account
+              </a>
+            )}
+          </div>
+          {/* Social Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px' }}>
+            <a href="mailto:subinesh.b2c@gmail.com" className="social-btn social-mail" aria-label="Email">
+              <Mail style={{ width: '22px', height: '22px' }} />
             </a>
-          )}
+            <a href="https://facebook.com/#" target="_blank" rel="noopener noreferrer" className="social-btn social-facebook" aria-label="Facebook">
+              <Facebook style={{ width: '22px', height: '22px' }} />
+            </a>
+            <a href="https://wa.me/919087352282" target="_blank" rel="noopener noreferrer" className="social-btn social-whatsapp" aria-label="WhatsApp">
+              <FaWhatsapp style={{ width: '22px', height: '22px' }} />
+            </a>
+            <a href="https://www.instagram.com/ur_friend_i_am/" target="_blank" rel="noopener noreferrer" className="social-btn social-instagram" aria-label="Instagram">
+              <Instagram style={{ width: '22px', height: '22px' }} />
+            </a>
+          </div>
         </div>
 
-        {/* Social Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-          <a href="#" style={{ color: '#6b6b6b' }} aria-label="Email">
-            <Mail style={{ width: '24px', height: '24px' }} />
-          </a>
-          <a href="#" style={{ color: '#6b6b6b' }} aria-label="Facebook">
-            <Facebook style={{ width: '24px', height: '24px' }} />
-          </a>
-          <a href="#" style={{ color: '#6b6b6b' }} aria-label="Twitter">
-            <Twitter style={{ width: '24px', height: '24px' }} />
-          </a>
-          <a href="#" style={{ color: '#6b6b6b' }} aria-label="Instagram">
-            <Instagram style={{ width: '24px', height: '24px' }} />
-          </a>
-        </div>
       </header>
 
       <style jsx>{`
+        .social-btn { color: #6b6b6b; transition: color 0.3s ease; }
+        .social-mail:hover { color: #ea4335 !important; }
+        .social-facebook:hover { color: #1877f2 !important; }
+        .social-whatsapp:hover { color: #25D366 !important; }
+        .social-instagram:hover { color: #e1306c !important; }
+        
+        .search-text-hover:hover { color: #52dd28ff !important; }
+
         .mobile-nav {
           display: flex;
         }
@@ -290,12 +361,20 @@ export default function Sidebar() {
           }
         }
 
-        a:hover, button:hover {
+        a:hover, button:hover:not(.logout-btn) {
           color: #52dd28ff !important;
         }
         
-        button:hover i {
+        button:hover:not(.logout-btn) i {
           color: #52dd28ff !important;
+        }
+
+        .logout-btn:hover {
+          color: #ff0000 !important;
+        }
+        
+        .logout-btn:hover i {
+          color: #ff0000 !important;
         }
         
         a:hover i {
@@ -306,7 +385,7 @@ export default function Sidebar() {
           color: #52dd28ff !important;
         }
         
-        .fa, .fa-search, .fa-user, .fa-sign-out {
+        .fa, .fa-user, .fa-sign-out {
           transition: color 0.3s ease;
         }
       `}</style>

@@ -83,7 +83,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Update quantity of existing item
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += quantity;
-        toast.success('Cart updated successfully');
         return updatedItems;
       } else {
         // Add new item
@@ -116,7 +115,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (filtered.length < prevItems.length) {
-        toast.info('Item removed from cart');
       }
       
       return filtered;
@@ -142,7 +140,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return item;
       });
       
-      toast.success('Cart updated');
       return updatedItems;
     });
   };

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Calendar, User, Clock, ArrowRight, Search, Tag, ChevronRight } from 'lucide-react';
 import Sidebar from '@/components/sections/Sidebar';
+import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
 
 // Sample blog data
@@ -96,7 +97,7 @@ export default function BlogsPage() {
   // Filter posts based on search and category
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -104,8 +105,9 @@ export default function BlogsPage() {
   return (
     <div className="min-h-screen bg-white">
       <Sidebar />
-      
-      <div className="main-content-wrapper">
+      <MobileNav />
+
+      <div className="main-content-wrapper lg:ml-[280px]">
         <div className="h-14 lg:hidden"></div>
 
         {/* Hero Section */}
@@ -123,7 +125,7 @@ export default function BlogsPage() {
               <p className="text-lg text-[#6b6b6b] mb-8">
                 Discover tips, guides, and stories about sustainable living and eco-friendly products
               </p>
-              
+
               {/* Search Bar */}
               <div className="relative max-w-md mx-auto">
                 <input
@@ -146,11 +148,10 @@ export default function BlogsPage() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
-                  selectedCategory === category
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${selectedCategory === category
                     ? 'bg-[#52dd28ff] text-white shadow-md'
                     : 'bg-white text-[#6b6b6b] border border-[#ebebeb] hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
-                }`}
+                  }`}
               >
                 {category}
               </button>
@@ -225,7 +226,7 @@ export default function BlogsPage() {
                           </div>
                           <span className="text-sm text-[#6b6b6b]">{post.author}</span>
                         </div>
-                        
+
                         <Link
                           href={`/blogs/${post.id}`}
                           className="flex items-center gap-1 text-sm font-medium text-[#52dd28ff] hover:gap-2 transition-all"

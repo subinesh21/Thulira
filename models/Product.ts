@@ -86,7 +86,7 @@ const productSchema = new mongoose.Schema({
 });
 
 // Update timestamps
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function (next) {
   this.updatedAt = new Date() as any;
   next();
 });
@@ -97,4 +97,4 @@ productSchema.index({ name: 'text', description: 'text' });
 
 const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema);
 
-export default ProductModel;
+export default ProductModel as mongoose.Model<any>;

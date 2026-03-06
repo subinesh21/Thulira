@@ -24,7 +24,7 @@
   --color-input: hsl(0 0% 90%);
   --color-ring: #52dd28ff;
   --radius: 0;
-  
+
   /* Font variables mapped to Next.js font variables */
   --font-body: var(--font-open-sans);
   --font-heading: var(--font-poppins);
@@ -42,16 +42,27 @@
   --color-eco-bg: #52dd28ff;
   --color-sale: #52dd28ff;
   --color-eco-footer: #52dd28ff;
-  
+
   /* Sidebar width */
   --sidebar-width: 280px;
 }
 
 @layer base {
+
   /* THE FIX FOR UNDERLINES: Overriding Bootstrap's Reboot */
-  a, .btn, button {
+  a,
+  .btn,
+  button {
     text-decoration: none !important;
     box-shadow: none !important;
+  }
+
+  header,
+  header * {
+    box-shadow: none !important;
+    outline: none !important;
+    filter: none !important;
+    -webkit-box-shadow: none !important;
   }
 
   a:hover {
@@ -66,13 +77,19 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
     width: 100%;
     margin: 0;
     padding: 0;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading;
   }
 }
@@ -83,11 +100,22 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  .bg-eco-footer{
+
+  .bg-eco-footer {
     background-color: #252525;
+  }
+
+  /* 
+   * Mobile tap target: Google/Apple recommend 44x44px minimum.
+   * Applied selectively to avoid breaking layouts.
+   */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
@@ -96,7 +124,8 @@
 /* Main layout wrapper - FIX for full width */
 .main-content-wrapper {
   min-height: 100vh;
-  margin-left: 280px; /* Same as sidebar width */
+  margin-left: 280px;
+  /* Same as sidebar width */
   float: right;
 }
 
@@ -380,7 +409,7 @@
     margin-left: 0;
     float: none;
   }
-  
+
   .products-catagories-area {
     padding: 100px 20px 80px;
   }
@@ -394,23 +423,23 @@
     padding: 0 20px;
     font-size: 12px;
   }
-  
+
   .footer_menu ul {
     flex-direction: column;
     align-items: center;
     gap: 10px;
   }
-  
+
   .shop_sidebar_area {
     width: 100%;
     padding: 30px 20px;
   }
-  
+
   .amado_product_area {
     padding: 40px 20px;
     width: 100%;
   }
-  
+
   .single-products-catagory .hover-content {
     top: 20px;
     left: 20px;

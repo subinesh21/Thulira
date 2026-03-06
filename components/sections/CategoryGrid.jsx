@@ -180,8 +180,8 @@ export default function CategoryGrid() {
     } else if (item.imageFit === 'contain') {
       return { objectFit: 'contain', objectPosition: item.imagePosition };
     } else if (item.imageFit === 'zoom') {
-      return { 
-        objectFit: 'cover', 
+      return {
+        objectFit: 'cover',
         objectPosition: item.imagePosition,
         transform: `scale(${item.imageZoom})`,
       };
@@ -201,7 +201,7 @@ export default function CategoryGrid() {
 
   // Helper function to get text position classes
   const getTextPosition = (position) => {
-    switch(position) {
+    switch (position) {
       case 'top-left':
         return 'top-0 left-0';
       case 'top-right':
@@ -218,7 +218,7 @@ export default function CategoryGrid() {
   };
 
   return (
-    <section className="bg-background w-full">      
+    <section className="bg-background w-full">
       {/* Main Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-0">
         {gridItems.map((item, index) => (
@@ -234,18 +234,20 @@ export default function CategoryGrid() {
               <div className={`relative w-full ${heightMap[item.gridSpan]} overflow-hidden`}>
                 <img
                   src={item.image}
-                  alt={item.name}
+                  alt={`${item.customName || item.name} - eco-friendly products by Thulira`}
                   className="w-full h-full transition-transform duration-700 group-hover:scale-110"
                   style={getImageStyle(item)}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
                   onError={(e) => {
                     e.target.src = '/images/product-chai-cups.jpg';
                     e.target.style.objectFit = 'cover';
                   }}
                 />
-                
+
                 {/* Custom overlay */}
                 <div className={`absolute inset-0 ${getOverlayStyle(item)} transition-colors duration-300`} />
-                
+
                 {/* Additional hover overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
               </div>
@@ -254,19 +256,19 @@ export default function CategoryGrid() {
               <div className={`absolute ${getTextPosition(item.textPosition)} ${item.padding}`}>
                 {/* Green accent bar - smaller on mobile */}
                 <div className="w-6 sm:w-8 md:w-10 h-[2px] sm:h-[2px] md:h-[3px] bg-[#52dd28ff] mb-1 sm:mb-1 md:mb-3" />
-                
+
                 {/* Price - smaller on mobile */}
                 <p className="text-[10px] sm:text-xs md:text-sm text-white font-medium mb-1">
                   From ₹{item.price}
                 </p>
-                                
+
                 {/* Mobile version - visible only on mobile */}
-                <h6 className="text-sm font-semibold text-white leading-tight block lg:hidden">
+                <h6 className="text-sm font-semibold text-white leading-tight block lg:hidden" style={{ fontFamily: 'var(--font-cinzel), serif', letterSpacing: '1.5px' }}>
                   {item.customName || item.name}
                 </h6>
 
                 {/* Desktop version - visible only on desktop */}
-                <h3 className="text-lg font-semibold text-white leading-tight hidden lg:block">
+                <h3 className="text-lg font-semibold text-white leading-tight hidden lg:block" style={{ fontFamily: 'var(--font-cinzel), serif', letterSpacing: '2px' }}>
                   {item.customName || item.name}
                 </h3>
                 {/* Product count - smaller on mobile */}
