@@ -1,8 +1,10 @@
 // Email Service for Invoice Delivery
 import nodemailer from 'nodemailer';
 import { INVOICE_CONFIG } from './payment-config';
+import { InvoiceGenerator, InvoiceData } from './invoice-generator';
 
 interface EmailOptions {
+  from?: string;
   to: string;
   subject: string;
   html: string;
@@ -19,14 +21,14 @@ export class EmailService {
   static initializeTransporter() {
     if (!this.transporter) {
       this.transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST || 'smtp.hostinger.com',
+        host: process.env.EMAIL_HOST || 'smtpout.secureserver.net',
         port: parseInt(process.env.EMAIL_PORT || '465'),
         secure: true,
         auth: {
-          user: process.env.EMAIL_USER || 'support@thulira.com',
+          user: process.env.EMAIL_USER || 'kannabiran@thulira.com',
           pass: process.env.EMAIL_PASS
         }
-      });
+      } as any);
     }
     return this.transporter;
   }
@@ -41,6 +43,7 @@ export class EmailService {
       const transporter = this.initializeTransporter();
 
       const mailOptions: EmailOptions = {
+        from: `Thulira <${process.env.EMAIL_USER || 'kannabiran@thulira.com'}>`,
         to: customerEmail,
         subject: `Order Confirmation #${orderId} - Thulira Sustainable Products`,
         html: this.generateInvoiceEmailTemplate(customerName, orderId, orderTotal)
@@ -126,6 +129,106 @@ export class EmailService {
     `;
   }
 
+  static async sendOrderConfirmationWithInvoice(
+    invoiceData: InvoiceData
+  ): Promise<boolean> {
+    try {
+      const transporter = this.initializeTransporter();
+
+      // Generate PDF
+      const pdfBuffer = await InvoiceGenerator.generateInvoicePDF(invoiceData);
+
+      const mailOptions: EmailOptions = {
+        from: `Thulira <${process.env.EMAIL_USER || 'kannabiran@thulira.com'}>`,
+        to: invoiceData.customer.email,
+        subject: `Order Confirmation & Invoice #${invoiceData.orderId} - Thulira Sustainable Products`,
+        html: this.generateFullOrderTemplate(invoiceData),
+        attachments: [
+          {
+            filename: `Invoice_${invoiceData.orderId}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      };
+
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Order confirmation email sent with invoice:', result.messageId);
+      return true;
+    } catch (error) {
+      console.error('Error sending order confirmation with invoice:', error);
+      return false;
+    }
+  }
+
+  static generateFullOrderTemplate(data: InvoiceData): string {
+    const itemsList = data.items.map(item =>
+      `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toFixed(2)}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₹${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>`
+    ).join('');
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Order Confirmation - Thulira</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 100%); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0;">Order Confirmed!</h1>
+        </div>
+
+        <div style="background-color: #ffffff; padding: 30px;">
+            <h2>Hello ${data.customer.name},</h2>
+            <p>Thank you for your order! Your payment method: <strong>${data.paymentMethod.toUpperCase()}</strong>.</p>
+            <p>Please find your detailed invoice attached to this email.</p>
+            
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <h3>Order #${data.orderId} Summary</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #2d5a3d; color: white;">
+                            <th style="padding: 10px; text-align: left;">Item</th>
+                            <th style="padding: 10px; text-align: center;">Qty</th>
+                            <th style="padding: 10px; text-align: right;">Price</th>
+                            <th style="padding: 10px; text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsList}
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right;">Subtotal:</td>
+                            <td style="padding: 10px; text-align: right;">₹${data.subtotal.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right;">Delivery:</td>
+                            <td style="padding: 10px; text-align: right;">₹${data.deliveryCharges.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right;">GST Additions:</td>
+                            <td style="padding: 10px; text-align: right;">₹${data.gstAmount.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1em;">Grand Total:</td>
+                            <td style="padding: 10px; text-align: right; font-weight: bold; font-size: 1.1em; color: #2d5a3d;">₹${data.totalAmount.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p style="margin-top: 20px;">We'll carefully prepare your sustainable products for shipment.</p>
+            <p>Need help? Contact us at ${INVOICE_CONFIG.COMPANY_EMAIL}</p>
+        </div>
+    </body>
+    </html>
+    `;
+  }
+
   static async sendOrderConfirmation(
     customerEmail: string,
     customerName: string,
@@ -137,6 +240,7 @@ export class EmailService {
       const transporter = this.initializeTransporter();
 
       const mailOptions: EmailOptions = {
+        from: `Thulira <${process.env.EMAIL_USER || 'kannabiran@thulira.com'}>`,
         to: customerEmail,
         subject: `Order Confirmation #${orderId} - Thulira Sustainable Products`,
         html: this.generateOrderConfirmationTemplate(customerName, orderId, orderItems, orderTotal)
@@ -157,7 +261,7 @@ export class EmailService {
     orderItems: any[],
     orderTotal: number
   ): string {
-    const itemsList = orderItems.map(item => 
+    const itemsList = orderItems.map(item =>
       `<tr>
         <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
         <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>

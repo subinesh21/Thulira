@@ -37,7 +37,7 @@ function ProductsContent() {
         const response = await fetch('/api/products?isActive=true');
         const data = await response.json();
         if (data.success) {
-          setProducts(data.products);
+          setProducts(data.products.reverse());
         } else {
           toast.error('Failed to load products');
         }

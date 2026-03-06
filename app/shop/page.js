@@ -90,7 +90,7 @@ export default function ShopPage() {
         const response = await fetch('/api/products?isActive=true');
         const data = await response.json();
         if (data.success) {
-          setProducts(data.products);
+          setProducts(data.products.reverse());
         } else {
           toast.error('Failed to load products');
         }
@@ -260,8 +260,8 @@ export default function ShopPage() {
                         key={c.id}
                         onClick={() => setSelectedCategory(c.id)}
                         className={`px-3 py-1.5 text-xs border rounded-box transition-colors w-100 ${selectedCategory === c.id
-                            ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
-                            : 'bg-background text-muted-foreground border-border hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
+                          ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
+                          : 'bg-background text-muted-foreground border-border hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
                           }`}
                       >
                         {c.name}
@@ -400,8 +400,8 @@ export default function ShopPage() {
                           key={p}
                           onClick={() => handlePageChange(p)}
                           className={`px-3 py-1 border text-sm rounded transition-colors ${currentPage === p
-                              ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
-                              : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
+                            ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
+                            : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
                             }`}
                         >
                           {p}
