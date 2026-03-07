@@ -28,9 +28,9 @@ async function migrateProducts() {
       category: {
         type: String,
         required: true,
-        enum: ['drinkware', 'tableware', 'storage', 'kitchenware', 'homeware', 'bakeware', 'gardenware', 'gifting']
+        
       },
-      brand: { type: String, required: true },
+      
       colors: [{ type: String }],
       inStock: { type: Boolean, default: true },
       description: { type: String, required: true },
@@ -44,7 +44,7 @@ async function migrateProducts() {
       createdAt: { type: Date, default: Date.now },
       updatedAt: { type: Date, default: Date.now }
     });
-    
+
     const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 
     // Clear existing products to avoid duplicates
@@ -60,7 +60,6 @@ async function migrateProducts() {
       hoverImage: product.hoverImage,
       images: product.images || {},
       category: product.category,
-      brand: product.brand,
       colors: product.colors || [],
       inStock: product.inStock !== undefined ? product.inStock : true,
       description: product.description,
@@ -72,21 +71,21 @@ async function migrateProducts() {
 
     // Insert products
     const result = await Product.insertMany(productsToInsert, { ordered: false });
-    
+
     console.log(`\n🎉 Migration completed successfully!`);
     console.log(`✅ Successfully migrated ${result.length} products to MongoDB`);
-    
+
     // Show some stats
     const categories = {};
     result.forEach(p => {
       categories[p.category] = (categories[p.category] || 0) + 1;
     });
-    
+
     console.log('\n📊 Products by category:');
     Object.entries(categories).forEach(([cat, count]) => {
       console.log(`   ${cat}: ${count}`);
     });
-    
+
     console.log('\n💡 Next steps:');
     console.log('   1. Restart your dev server: npm run dev');
     console.log('   2. Visit /shop to see products from MongoDB');

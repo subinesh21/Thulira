@@ -157,3 +157,8 @@ logs/
 *.backup
 .vercel
 .env*.local
+
+# Sensitive files
+cookies.txt
+*.log
+migrate*.log

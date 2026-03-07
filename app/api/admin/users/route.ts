@@ -1,33 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import UserModel from '@/models/User';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Cap at 100
 
     // Build query - only users (not admins)
     const query: any = { role: 'user' };
-    
+
     // Add search filter if provided
     if (search) {
+      // Sanitize search input to prevent ReDoS
+      const sanitizedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
+        { name: { $regex: sanitizedSearch, $options: 'i' } },
+        { email: { $regex: sanitizedSearch, $options: 'i' } },
       ];
     }
 
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Fetch users with pagination - FIXED with type assertion
-    const users = await (UserModel as any).find(query)      
-      .select('-password')
+    // Fetch users with pagination
+    const users = await (UserModel as any).find(query)
+      .select('-password -otp -otpExpires')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -69,6 +76,10 @@ export async function GET(request: NextRequest) {
 
 // Update user status (activate/deactivate)
 export async function PATCH(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
@@ -82,12 +93,11 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // FIXED: Added type assertion for findByIdAndUpdate
     const user = await (UserModel as any).findByIdAndUpdate(
       userId,
       { isActive, updatedAt: new Date() },
       { new: true }
-    ).select('-password');
+    ).select('-password -otp -otpExpires');
 
     if (!user) {
       return NextResponse.json(

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { CATEGORIES, getProductsByCategory } from '@/lib/product-data';
 
@@ -24,106 +25,8 @@ export default function CategoryGrid() {
     setCategoryPrices(prices);
   }, []);
 
-  // MANUAL GRID CONFIGURATION - Edit this array to control each grid item
-  const gridItems = [
-    {
-      id: 'drinkware',
-      name: 'Drinkware',
-      customName: 'Coffee & Tea',
-      price: 199,
-      image: '/images/category-drinkware.png',
-      imageFit: 'cover',
-      imagePosition: 'center',
-      gridSpan: 'normal',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.3,
-      padding: 'p-3 sm:p-6',
-      count: 12,
-    },
-    {
-      id: 'tableware',
-      name: 'Tableware',
-      customName: 'Dining Essentials',
-      price: 249,
-      image: '/images/category-tableware.png',
-      imageFit: 'cover',
-      imagePosition: 'center',
-      gridSpan: 'normal',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.4,
-      padding: 'p-3 sm:p-6',
-      count: 18,
-    },
-    {
-      id: 'storage',
-      name: 'Storage',
-      customName: 'Kitchen Storage',
-      price: 179,
-      image: '/images/category-storage.png',
-      imageFit: 'cover',
-      imagePosition: 'center',
-      gridSpan: 'wide',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.3,
-      padding: 'p-3 sm:p-6',
-      count: 12,
-    },
-    {
-      id: 'kitchenware',
-      name: 'Kitchenware',
-      customName: 'Kitchen Tools',
-      price: 299,
-      image: '/images/catagory-kitchentools.png',
-      imageFit: 'cover',
-      imagePosition: 'center',
-      gridSpan: 'wide',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.35,
-      padding: 'p-3 sm:p-6',
-      count: 15,
-    },
-    {
-      id: 'gardenware',
-      name: 'Gardenware',
-      customName: 'Indo-Gardenware',
-      price: 159,
-      image: '/images/catagory-indo-gardenware.png',
-      imageFit: 'cover',
-      imagePosition: 'center',
-      gridSpan: 'normal',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.25,
-      padding: 'p-3 sm:p-6',
-      count: 10,
-    },
-    {
-      id: 'outdoor',
-      name: 'Outdoor',
-      customName: 'Outdoor Living',
-      price: 349,
-      image: '/images/catagory-out-gardenware.png',
-      imageFit: 'cover',
-      imageZoom: 1.2,
-      imagePosition: 'center',
-      gridSpan: 'normal',
-      textPosition: 'top-left',
-      textColor: 'white',
-      overlay: 'dark',
-      overlayOpacity: 0.4,
-      padding: 'p-3 sm:p-6',
-      count: 6,
-    },
-  ];
+  // Grid items are now fetched centrally from lib/product-data.js
+  const gridItems = CATEGORIES;
 
   // Grid span mapping - Different behavior for mobile vs desktop
   const spanMap = {
@@ -195,16 +98,18 @@ export default function CategoryGrid() {
           >
             <Link href={`/products#${item.id}`} className="block h-full">
               <div className="relative w-full h-full overflow-hidden">
-                <img
+                <Image
                   src={item.image}
                   alt={`${item.customName || item.name} - eco-friendly products by Thulira`}
-                  className="w-full h-full transition-transform duration-700 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="transition-transform duration-700 group-hover:scale-110"
                   style={getImageStyle(item)}
-                  loading={index < 2 ? 'eager' : 'lazy'}
-                  decoding="async"
+                  priority={index < 2}
                   onError={(e) => {
-                    e.target.src = '/images/product-chai-cups.jpg';
-                    e.target.style.objectFit = 'cover';
+                    e.currentTarget.srcset = '';
+                    e.currentTarget.src = '/images/product-chai-cups.jpg';
+                    e.currentTarget.style.objectFit = 'cover';
                   }}
                 />
 
@@ -221,7 +126,7 @@ export default function CategoryGrid() {
                 <div className="w-6 sm:w-8 md:w-10 h-[2px] sm:h-[2px] md:h-[3px] bg-[#52dd28ff] mb-1 sm:mb-1 md:mb-3" />
 
                 {/* Price - smaller on mobile */}
-                <p className="text-[10px] sm:text-xs md:text-sm text-white font-medium mb-1">
+                <p className="font-mono text-[10px] sm:text-xs md:text-sm text-white font-medium mb-1">
                   From ₹{item.price}
                 </p>
 
@@ -235,7 +140,7 @@ export default function CategoryGrid() {
                   {item.customName || item.name}
                 </h3>
                 {/* Product count - smaller on mobile */}
-                <p className="text-[8px] sm:text-[10px] md:text-xs text-white/80 mt-0.5 sm:mt-1">
+                <p className="font-mono text-[8px] sm:text-[10px] md:text-xs text-white/80 mt-0.5 sm:mt-1">
                   {item.count} Products
                 </p>
               </div>

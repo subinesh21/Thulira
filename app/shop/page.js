@@ -10,18 +10,11 @@ import Footer from '@/components/sections/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import ProductCard from '@/components/ProductCard';
 import { toast } from 'react-toastify';
-import { CATEGORY_INFO } from '@/lib/product-data';
+import { CATEGORY_INFO, CATEGORIES } from '@/lib/product-data';
 
 const categories = [
   { id: 'all', name: 'All Categories' },
-  { id: 'drinkware', name: 'Drinkware' },
-  { id: 'tableware', name: 'Tableware' },
-  { id: 'storage', name: 'Storage' },
-  { id: 'kitchenware', name: 'Kitchenware' },
-  { id: 'homeware', name: 'Homeware' },
-  { id: 'bakeware', name: 'Bakeware' },
-  { id: 'gardenware', name: 'Gardenware' },
-  { id: 'gifting', name: 'Gifting' },
+  ...CATEGORIES.map(c => ({ id: c.id, name: c.name }))
 ];
 
 const colorOptions = [
@@ -158,12 +151,10 @@ export default function ShopPage() {
 
   // Paginate products
   useEffect(() => {
-    if (filteredProducts.length > 0) {
-      const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
-      const endIndex = startIndex + PRODUCTS_PER_PAGE;
-      const paginated = filteredProducts.slice(startIndex, endIndex);
-      setPaginatedProducts(paginated);
-    }
+    const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const endIndex = startIndex + PRODUCTS_PER_PAGE;
+    const paginated = filteredProducts.slice(startIndex, endIndex);
+    setPaginatedProducts(paginated);
   }, [filteredProducts, currentPage]);
 
   const handlePageChange = (page) => {
@@ -198,9 +189,9 @@ export default function ShopPage() {
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-muted aspect-square w-full mb-2 sm:mb-4 rounded"></div>
-                  <div className="h-3 sm:h-4 bg-muted w-3/4 mb-1 sm:mb-2 rounded"></div>
-                  <div className="h-3 sm:h-4 bg-muted w-1/2 rounded"></div>
+                  <div className="bg-muted aspect-square w-full mb-2 sm:mb-4 rounded-box"></div>
+                  <div className="h-3 sm:h-4 bg-muted w-3/4 mb-1 sm:mb-2 rounded-box"></div>
+                  <div className="h-3 sm:h-4 bg-muted w-1/2 rounded-box"></div>
                 </div>
               ))}
             </div>
@@ -223,14 +214,14 @@ export default function ShopPage() {
           <div className="flex items-center gap-3 mb-4 lg:hidden">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 border border-border text-muted-foreground text-sm hover:text-[#52dd28ff] transition-colors rounded"
+              className="flex items-center gap-2 px-4 py-2 border border-border text-muted-foreground text-sm hover:text-[#52dd28ff] transition-colors rounded-box"
             >
               <Filter className="w-4 h-4" /> Filters
             </button>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-border text-sm text-muted-foreground focus:outline-none focus:border-[#52dd28ff] flex-1 bg-background rounded"
+              className="px-3 py-2 border border-border text-sm text-muted-foreground focus:outline-none focus:border-[#52dd28ff] flex-1 bg-background rounded-box"
             >
               {sortOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -270,6 +261,33 @@ export default function ShopPage() {
                   </div>
                 </div>
 
+                {/* Colors */}
+                <div>
+                  <h3 className="text-sm font-medium text-[#52dd28ff] mb-3">Colors</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {colorOptions.map(c => (
+                      <button
+                        key={c.name}
+                        onClick={() => toggleColor(c.name)}
+                        title={c.name}
+                        className={`w-7 h-7 rounded-full border-2 transition-all ${selectedColors.includes(c.name)
+                            ? 'border-[#52dd28ff] scale-110 ring-2 ring-[#52dd28ff]/30'
+                            : 'border-border hover:border-[#52dd28ff]/50'
+                          }`}
+                        style={{
+                          background: c.color,
+                          boxShadow: c.name === 'White' ? 'inset 0 0 0 1px rgba(0,0,0,0.1)' : undefined
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {selectedColors.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Selected: {selectedColors.join(', ')}
+                    </p>
+                  )}
+                </div>
+
                 {/* Price range */}
                 <div>
                   <h3 className="text-sm font-medium text-[#52dd28ff] mb-3">Price Range</h3>
@@ -297,7 +315,7 @@ export default function ShopPage() {
                     id="inStock"
                     checked={inStockOnly}
                     onChange={(e) => setInStockOnly(e.target.checked)}
-                    className="w-4 h-4 text-[#52dd28ff] border-border rounded focus:ring-[#52dd28ff]"
+                    className="w-4 h-4 text-[#52dd28ff] border-border rounded-box focus:ring-[#52dd28ff]"
                   />
                   <label htmlFor="inStock" className="text-sm text-muted-foreground">
                     In Stock Only
@@ -315,7 +333,7 @@ export default function ShopPage() {
                 {/* Close filters for mobile */}
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="lg:hidden w-full py-2 border border-border text-muted-foreground hover:text-[#52dd28ff] transition-colors rounded"
+                  className="lg:hidden w-full py-2 border border-border text-muted-foreground hover:text-[#52dd28ff] transition-colors rounded-box"
                 >
                   Close Filters
                 </button>
@@ -330,7 +348,7 @@ export default function ShopPage() {
                   <p className="text-muted-foreground mb-4">Try adjusting your filters</p>
                   <button
                     onClick={clearFilters}
-                    className="px-4 py-2 bg-[#52dd28ff] text-white text-sm hover:bg-[#45b824] transition-colors rounded"
+                    className="px-4 py-2 bg-[#52dd28ff] text-white text-sm hover:bg-[#45b824] transition-colors rounded-box"
                   >
                     Clear Filters
                   </button>
@@ -345,14 +363,14 @@ export default function ShopPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-1.5 rounded transition-colors ${viewMode === 'grid' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
+                        className={`p-1.5 rounded-box transition-colors ${viewMode === 'grid' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
                         title="Grid View"
                       >
                         <LayoutGrid className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setViewMode('list')}
-                        className={`p-1.5 rounded transition-colors ${viewMode === 'list' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
+                        className={`p-1.5 rounded-box transition-colors ${viewMode === 'list' ? 'bg-[#52dd28ff] text-white' : 'text-muted-foreground hover:text-[#52dd28ff] border border-border'}`}
                         title="List View"
                       >
                         <List className="w-4 h-4" />
@@ -390,7 +408,7 @@ export default function ShopPage() {
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 border border-border rounded disabled:opacity-30 text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff] transition-colors"
+                        className="p-2 border border-border rounded-box disabled:opacity-30 text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff] transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
@@ -399,7 +417,7 @@ export default function ShopPage() {
                         <button
                           key={p}
                           onClick={() => handlePageChange(p)}
-                          className={`px-3 py-1 border text-sm rounded transition-colors ${currentPage === p
+                          className={`px-3 py-1 border text-sm rounded-box transition-colors ${currentPage === p
                             ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
                             : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
                             }`}
@@ -411,7 +429,7 @@ export default function ShopPage() {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-2 border border-border rounded disabled:opacity-30 text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff] transition-colors"
+                        className="p-2 border border-border rounded-box disabled:opacity-30 text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff] transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>

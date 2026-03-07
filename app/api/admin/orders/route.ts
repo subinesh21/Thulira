@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import OrderModel from '@/models/Order';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Cap at 100
 
     // Build query
     const query: any = {};
@@ -65,6 +70,10 @@ export async function GET(request: NextRequest) {
 
 // Update order status
 export async function PATCH(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 

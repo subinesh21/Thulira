@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, Trash2, ShoppingCart, ArrowLeft } from 'lucide-react';
 import Sidebar from '@/components/sections/Sidebar';
 import MobileNav from '@/components/MobileNav';
@@ -74,7 +75,7 @@ export default function WishlistPage() {
                             <p className="text-sm text-[#6b6b6b] mb-6">Add items you love to your wishlist. Review them anytime and easily move them to cart.</p>
                             <Link
                                 href="/shop"
-                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#fbb710] text-white text-sm font-semibold hover:bg-[#52dd28ff] transition-colors"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-[#fbb710] text-white text-sm font-semibold hover:bg-[#52dd28ff] transition-colors rounded-box"
                             >
                                 <ArrowLeft className="w-4 h-4" />
                                 Continue Shopping
@@ -85,16 +86,18 @@ export default function WishlistPage() {
                             {wishlistItems.map((item) => (
                                 <div
                                     key={item._id}
-                                    className="flex bg-white border border-[#ebebeb] rounded-lg overflow-hidden"
+                                    className="flex bg-white border border-[#ebebeb] rounded-box overflow-hidden"
                                 >
                                     {/* Image */}
                                     <Link href={`/detail/${item._id}`} className="flex-shrink-0 w-28 sm:w-36 lg:w-44">
-                                        <div className="h-full bg-[#f5f7fa] overflow-hidden">
-                                            <img
+                                        <div className="relative h-full bg-[#f5f7fa] overflow-hidden min-h-[140px]">
+                                            <Image
                                                 src={item.image}
                                                 alt={item.name}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { e.target.src = '/images/product-chai-cups.jpg'; }}
+                                                fill
+                                                sizes="(max-width: 640px) 112px, (max-width: 1024px) 144px, 176px"
+                                                className="object-cover"
+                                                onError={(e) => { e.currentTarget.srcset = ''; e.currentTarget.src = '/images/product-chai-cups.jpg'; }}
                                             />
                                         </div>
                                     </Link>
@@ -135,7 +138,7 @@ export default function WishlistPage() {
                                         <div className="flex items-center gap-2 sm:gap-3">
                                             <button
                                                 onClick={() => handleAddToCart(item)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fbb710] text-white text-xs sm:text-sm font-medium hover:bg-[#52dd28ff] transition-colors rounded"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#fbb710] text-white text-xs sm:text-sm font-medium hover:bg-[#52dd28ff] transition-colors rounded-box"
                                             >
                                                 <ShoppingCart className="w-3.5 h-3.5" />
                                                 Add to Cart

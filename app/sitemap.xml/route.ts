@@ -16,7 +16,6 @@ const CATEGORIES = [
   'tableware', 
   'storage',
   'kitchenware',
-  'homeware',
   'bakeware',
   'gardenware',
   'gifting'

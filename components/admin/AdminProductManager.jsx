@@ -370,7 +370,7 @@ export default function AdminProductManager() {
         <div className="flex space-x-3">
           <button
             onClick={handleAddNew}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-box transition-colors flex items-center space-x-2"
           >
             <AddIcon />
             <span>Add New Product</span>
@@ -380,7 +380,7 @@ export default function AdminProductManager() {
 
       {/* Product Form */}
       {(expandedProduct === 'new' || expandedProduct) && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white rounded-box shadow-md p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
               {isAddingNew ? 'Add New Product' : 'Edit Product'}
@@ -395,7 +395,7 @@ export default function AdminProductManager() {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
             </div>
@@ -407,7 +407,7 @@ export default function AdminProductManager() {
                 name="price"
                 value={formData.price}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 step="0.01"
                 required
               />
@@ -420,7 +420,7 @@ export default function AdminProductManager() {
                 name="originalPrice"
                 value={formData.originalPrice}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 step="0.01"
               />
             </div>
@@ -433,12 +433,12 @@ export default function AdminProductManager() {
                   name="primaryImage"
                   value={formData.primaryImage}
                   onChange={handleInputChange}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                   placeholder="Enter image URL or upload below"
                 />
                 <div className="flex flex-col space-y-2">
-                  <label className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm cursor-pointer transition-colors">
+                  <label className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-box text-sm cursor-pointer transition-colors">
                     {uploading ? 'Uploading...' : 'Upload'}
                     <input
                       type="file"
@@ -455,7 +455,7 @@ export default function AdminProductManager() {
                   <img
                     src={formData.primaryImage}
                     alt="Preview"
-                    className="h-20 w-20 object-cover rounded-md border"
+                    className="h-20 w-20 object-cover rounded-box border"
                   />
                 </div>
               )}
@@ -469,11 +469,11 @@ export default function AdminProductManager() {
                   name="hoverImage"
                   value={formData.hoverImage}
                   onChange={handleInputChange}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                   placeholder="Enter image URL or upload below"
                 />
                 <div className="flex flex-col space-y-2">
-                  <label className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm cursor-pointer transition-colors">
+                  <label className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-box text-sm cursor-pointer transition-colors">
                     {uploading ? 'Uploading...' : 'Upload'}
                     <input
                       type="file"
@@ -502,7 +502,7 @@ export default function AdminProductManager() {
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="drinkware">Drinkware</option>
                 <option value="tableware">Tableware</option>
@@ -524,7 +524,7 @@ export default function AdminProductManager() {
                   'Black', 'Natural', 'Walnut', 'Bamboo', 'Natural Wood',
                   'Terracotta', 'Multi'
                 ].map((color) => (
-                  <label key={color} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                  <label key={color} className="flex items-center gap-2 p-2 border rounded-box hover:bg-gray-50 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={formData.colors.split(',').map(c => c.trim()).includes(color)}
@@ -553,7 +553,7 @@ export default function AdminProductManager() {
                 name="colors"
                 value={formData.colors}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                 placeholder="Selected colors will appear here"
                 readOnly
               />
@@ -566,7 +566,7 @@ export default function AdminProductManager() {
                 name="rating"
                 value={formData.rating}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 step="0.1"
                 min="0"
                 max="5"
@@ -580,7 +580,7 @@ export default function AdminProductManager() {
                 name="reviews"
                 value={formData.reviews}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 min="0"
               />
             </div>
@@ -592,20 +592,20 @@ export default function AdminProductManager() {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                 required
               />
             </div>
 
             {/* FAQ Section */}
             <div className="md:col-span-2">
-              <div className="border border-gray-200 rounded-lg p-4">
+              <div className="border border-gray-200 rounded-box p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-800">Product FAQs</h3>
                   <button
                     type="button"
                     onClick={addFAQ}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-box transition-colors text-sm"
                   >
                     Add FAQ
                   </button>
@@ -613,7 +613,7 @@ export default function AdminProductManager() {
 
                 <div className="space-y-4">
                   {formData.faqs.map((faq, index) => (
-                    <div key={index} className="border border-gray-100 rounded-lg p-4 relative">
+                    <div key={index} className="border border-gray-100 rounded-box p-4 relative">
                       <button
                         type="button"
                         onClick={() => removeFAQ(index)}
@@ -631,7 +631,7 @@ export default function AdminProductManager() {
                             type="text"
                             value={faq.question}
                             onChange={(e) => updateFAQ(index, 'question', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter frequently asked question"
                             required
                           />
@@ -645,7 +645,7 @@ export default function AdminProductManager() {
                             value={faq.answer}
                             onChange={(e) => updateFAQ(index, 'answer', e.target.value)}
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-box focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Enter detailed answer"
                             required
                           />
@@ -666,7 +666,7 @@ export default function AdminProductManager() {
             {/* Color Images Section */}
             {formData.colors && formData.colors.trim() && (
               <div className="md:col-span-2">
-                <div className="border border-gray-200 rounded-lg p-4">
+                <div className="border border-gray-200 rounded-box p-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-gray-800">Color Images</h3>
                     <button
@@ -681,7 +681,7 @@ export default function AdminProductManager() {
                   {showColorImages && (
                     <div className="space-y-6">
                       {formData.colors.split(',').map(color => color.trim()).filter(color => color).map((color) => (
-                        <div key={color} className="border border-gray-100 rounded-lg p-4">
+                        <div key={color} className="border border-gray-100 rounded-box p-4">
                           <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
                             <div
                               className="w-4 h-4 rounded-full border"
@@ -709,7 +709,7 @@ export default function AdminProductManager() {
                                         };
                                       });
                                     }}
-                                    className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                    className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded-box focus:outline-none focus:ring-1 focus:ring-green-500"
                                     placeholder={`Image ${index + 1} URL`}
                                   />
                                   <label className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs cursor-pointer transition-colors whitespace-nowrap">
@@ -727,7 +727,7 @@ export default function AdminProductManager() {
                                     <img
                                       src={colorImages[color][index]}
                                       alt={`${color} image ${index + 1}`}
-                                      className="w-full h-20 object-cover rounded border"
+                                      className="w-full h-20 object-cover rounded-box border"
                                     />
                                     <button
                                       type="button"
@@ -787,7 +787,7 @@ export default function AdminProductManager() {
             <div className="md:col-span-2 flex space-x-4 pt-4">
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-box transition-colors flex items-center"
                 disabled={uploading}
               >
                 {uploading ? (
@@ -806,7 +806,7 @@ export default function AdminProductManager() {
               <button
                 type="button"
                 onClick={cancelForm}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
+                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-box transition-colors"
               >
                 Cancel
               </button>
@@ -816,7 +816,7 @@ export default function AdminProductManager() {
       )}
 
       {/* Products List */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white rounded-box shadow-md overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">All Products ({products.length})</h2>
         </div>
@@ -839,7 +839,7 @@ export default function AdminProductManager() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <img className="h-10 w-10 rounded-md object-cover" src={product.primaryImage} alt="" />
+                        <img className="h-10 w-10 rounded-box object-cover" src={product.primaryImage} alt="" />
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -876,31 +876,31 @@ export default function AdminProductManager() {
                     <div className="flex items-center justify-end gap-3">
                       <button
                         onClick={() => handleEdit(product)}
-                        className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
+                        className="px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-box transition-colors"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleToggleStock(product)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${product.inStock
-                            ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100'
-                            : 'text-green-700 bg-green-50 hover:bg-green-100'
+                        className={`px-3 py-1.5 text-sm font-medium rounded-box transition-colors ${product.inStock
+                          ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100'
+                          : 'text-green-700 bg-green-50 hover:bg-green-100'
                           }`}
                       >
                         {product.inStock ? 'Unstock' : 'Restock'}
                       </button>
                       <button
                         onClick={() => handleToggleVisibility(product)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${product.isActive
-                            ? 'text-blue-700 bg-blue-50 hover:bg-blue-100'
-                            : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
+                        className={`px-3 py-1.5 text-sm font-medium rounded-box transition-colors ${product.isActive
+                          ? 'text-blue-700 bg-blue-50 hover:bg-blue-100'
+                          : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
                           }`}
                       >
                         {product.isActive ? 'Hide' : 'Show'}
                       </button>
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors"
+                        className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-box transition-colors"
                       >
                         Delete
                       </button>

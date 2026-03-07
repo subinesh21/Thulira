@@ -3,13 +3,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Eye, Heart } from 'lucide-react';
+import Image from 'next/image';
+import { ShoppingCart, Eye, Heart, Image as ImageIcon } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useRouter } from 'next/navigation';
 
 export default function ProductCard({ product, categoryImage, viewMode = 'grid' }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
   const router = useRouter();
@@ -39,8 +41,24 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
     if (isHovered && product.hoverImage) {
       return product.hoverImage;
     }
-    return product.primaryImage || product.image || categoryImage || '/images/product-chai-cups.jpg';
+    return product.primaryImage || product.image;
   };
+
+  const currentImage = getCurrentImage();
+  const hasImage = !!currentImage && !imageError;
+
+  // Placeholder Skeleton UI
+  const ImageSkeleton = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#f0f2f5] animate-pulse overflow-hidden px-4">
+      <div className="relative mb-3">
+        <ImageIcon className="w-10 h-10 lg:w-16 lg:h-16 text-gray-200" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]" />
+      </div>
+      <span className="text-[10px] lg:text-xs text-gray-400 font-medium text-center line-clamp-2 uppercase tracking-tight opacity-70" style={{ fontFamily: 'var(--font-mono), monospace' }}>
+        {product.name}
+      </span>
+    </div>
+  );
 
   // LIST VIEW
   if (viewMode === 'list') {
@@ -51,16 +69,20 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
         {/* Image */}
         <Link href={`/detail/${product._id || product.id}`} className="flex-shrink-0 w-32 sm:w-40 lg:w-48">
           <div className="relative h-full bg-[#f5f7fa] overflow-hidden">
-            <img
-              src={getCurrentImage()}
-              alt={`${product.name} - Thulira sustainable product`}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              decoding="async"
-              onError={(e) => {
-                e.target.src = categoryImage || '/images/product-chai-cups.jpg';
-              }}
-            />
+            {hasImage ? (
+              <Image
+                src={currentImage}
+                alt={`${product.name} - Thulira sustainable product`}
+                fill
+                sizes="(max-width: 640px) 128px, (max-width: 1024px) 160px, 192px"
+                className="object-cover"
+                onError={() => {
+                  setImageError(true);
+                }}
+              />
+            ) : (
+              <ImageSkeleton />
+            )}
             {!product.inStock && (
               <div className="absolute top-2 left-2 bg-gray-500 text-white text-[10px] font-medium px-1.5 py-0.5 rounded">
                 Out of Stock
@@ -136,58 +158,50 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
     >
       <Link href={`/detail/${product._id || product.id}`}>
         <div className="relative aspect-square bg-[#f5f7fa] overflow-hidden mb-2 sm:mb-3 lg:mb-4">
-          <img
-            src={getCurrentImage()}
-            alt={`${product.name} - Thulira sustainable product`}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-            loading="lazy"
-            decoding="async"
-            onError={(e) => {
-              e.target.src = categoryImage || '/images/product-chai-cups.jpg';
-            }}
-          />
+          {hasImage ? (
+            <Image
+              src={currentImage}
+              alt={`${product.name} - Thulira sustainable product`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={() => {
+                setImageError(true);
+              }}
+            />
+          ) : (
+            <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+              <ImageSkeleton />
+            </div>
+          )}
 
-          {/* Quick Actions - visible on hover */}
+          {/* Quick Actions - Gray Circle Emoji Style */}
           <div
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px 0',
-              opacity: isHovered ? 1 : 0,
-              transform: isHovered ? 'translateY(0)' : 'translateY(8px)',
-              transition: 'all 0.3s ease',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.15), transparent)',
-              pointerEvents: isHovered ? 'auto' : 'none'
-            }}
+            className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex justify-center text-lg items-center z-20 gap-2.5 transition-all duration-500 *:transition-all *:duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+              }`}
           >
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center text-[#131212] hover:text-[#fbb710] hover:shadow-lg transition-all duration-300 disabled:opacity-50 transform hover:scale-110"
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['CART'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
               aria-label="Add to cart"
             >
-              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+              🛒
             </button>
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/detail/${product._id || product.id}`); }}
-              className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center text-[#131212] hover:text-[#fbb710] hover:shadow-lg transition-all duration-300 transform hover:scale-110"
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['VIEW'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
               aria-label="Quick view"
             >
-              <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+              👁️
             </button>
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToWishlist(product); }}
-              className={`w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center hover:shadow-lg transition-all duration-300 transform hover:scale-110 ${isInWishlist(product._id || product.id) ? 'text-red-500' : 'text-[#131212] hover:text-[#fbb710]'
-                }`}
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['WISH'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
               aria-label="Add to wishlist"
             >
-              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isInWishlist(product._id || product.id) ? 'fill-red-500' : ''}`} />
+              {isInWishlist(product._id || product.id) ? '❤️' : '🤍'}
             </button>
           </div>
 

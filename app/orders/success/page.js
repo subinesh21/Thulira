@@ -15,7 +15,7 @@ function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
   const hasCleared = useRef(false);
-  
+
   const [orderDetails, setOrderDetails] = useState({
     orderId: '',
     invoiceNumber: '',
@@ -32,7 +32,7 @@ function OrderSuccessContent() {
     // Get order details from URL params
     const orderId = searchParams.get('orderId');
     const invoiceNumber = searchParams.get('invoiceNumber');
-    
+
     if (orderId || invoiceNumber) {
       setOrderDetails({
         orderId: orderId || '',
@@ -55,7 +55,7 @@ function OrderSuccessContent() {
           transition={{ duration: 0.5 }}
           className="max-w-2xl mx-auto text-center"
         >
-          <div className="bg-white rounded-xl border border-[#ebebeb] p-12">
+          <div className="bg-white rounded-box border border-[#ebebeb] p-12">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -68,10 +68,10 @@ function OrderSuccessContent() {
             <h1 className="text-3xl font-bold text-[#131212] mb-4">
               Order Placed Successfully!
             </h1>
-            
+
             {/* Order Details */}
             {(orderDetails.orderId || orderDetails.invoiceNumber) && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+              <div className="bg-green-50 border border-green-200 rounded-box p-6 mb-6">
                 <h3 className="text-lg font-semibold text-green-800 mb-3">Order Details</h3>
                 {orderDetails.orderId && (
                   <p className="text-sm text-green-700 mb-1">
@@ -90,13 +90,13 @@ function OrderSuccessContent() {
                 )}
               </div>
             )}
-            
+
             <p className="text-[#6b6b6b] mb-8">
               Thank you for your order! We've sent a confirmation email to your registered email address.
               You can track your order status in your account dashboard.
             </p>
 
-            <div className="bg-[#f5f7fa] p-6 rounded-lg mb-8">
+            <div className="bg-[#f5f7fa] p-6 rounded-box mb-8">
               <Package className="w-12 h-12 text-[#fbb710] mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-[#131212] mb-4">
                 What's Next?
@@ -144,14 +144,14 @@ function OrderSuccessContent() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/account"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#fbb710] text-white hover:bg-[#131212] transition-colors rounded"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#fbb710] text-white hover:bg-[#131212] transition-colors rounded-box"
               >
                 <Package className="w-5 h-5" />
                 View My Orders
               </Link>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#ebebeb] text-[#131212] hover:border-[#fbb710] hover:text-[#fbb710] transition-colors rounded"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#ebebeb] text-[#131212] hover:border-[#fbb710] hover:text-[#fbb710] transition-colors rounded-box"
               >
                 <Home className="w-5 h-5" />
                 Continue Shopping
@@ -169,14 +169,14 @@ function OrderSuccessLoading() {
   return (
     <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="max-w-2xl mx-auto text-center">
-        <div className="bg-white rounded-xl border border-[#ebebeb] p-12">
+        <div className="bg-white rounded-box border border-[#ebebeb] p-12">
           <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-6 animate-pulse" />
-          <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-4 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-full max-w-md mx-auto mb-2 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-8 animate-pulse" />
+          <div className="h-8 bg-gray-200 rounded-box w-64 mx-auto mb-4 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded-box w-full max-w-md mx-auto mb-2 animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded-box w-3/4 mx-auto mb-8 animate-pulse" />
           <div className="space-y-3">
-            <div className="h-20 bg-gray-200 rounded animate-pulse" />
-            <div className="h-20 bg-gray-200 rounded animate-pulse" />
+            <div className="h-20 bg-gray-200 rounded-box animate-pulse" />
+            <div className="h-20 bg-gray-200 rounded-box animate-pulse" />
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/context/CartContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { CATEGORY_INFO } from '@/lib/product-data';
+import { CATEGORY_INFO, CATEGORIES } from '@/lib/product-data';
 
 function ProductsContent() {
   const [products, setProducts] = useState([]);
@@ -100,7 +100,7 @@ function ProductsContent() {
     }
   }, [loading, searchQuery, searchParams]);
 
-  const categoryOrder = ['drinkware', 'tableware', 'storage', 'kitchenware', 'homeware', 'bakeware', 'gardenware', 'gifting', 'outdoor'];
+  const categoryOrder = CATEGORIES.map(c => c.id);
 
   if (loading) {
     return (
@@ -133,14 +133,14 @@ function ProductsContent() {
         <span className="text-xs text-[#6b6b6b] mr-1">View:</span>
         <button
           onClick={() => setViewMode('grid')}
-          className={`p-1.5 rounded transition-colors ${viewMode === 'grid' ? 'bg-[#52dd28ff] text-white' : 'text-[#6b6b6b] hover:text-[#52dd28ff] border border-[#ebebeb]'}`}
+          className={`p-1.5 rounded-box transition-colors ${viewMode === 'grid' ? 'bg-[#52dd28ff] text-white' : 'text-[#6b6b6b] hover:text-[#52dd28ff] border border-[#ebebeb]'}`}
           title="Grid View"
         >
           <LayoutGrid className="w-4 h-4" />
         </button>
         <button
           onClick={() => setViewMode('list')}
-          className={`p-1.5 rounded transition-colors ${viewMode === 'list' ? 'bg-[#52dd28ff] text-white' : 'text-[#6b6b6b] hover:text-[#52dd28ff] border border-[#ebebeb]'}`}
+          className={`p-1.5 rounded-box transition-colors ${viewMode === 'list' ? 'bg-[#52dd28ff] text-white' : 'text-[#6b6b6b] hover:text-[#52dd28ff] border border-[#ebebeb]'}`}
           title="List View"
         >
           <List className="w-4 h-4" />

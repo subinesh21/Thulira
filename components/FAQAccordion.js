@@ -17,7 +17,7 @@ export default function FAQAccordion({ faqs = [] }) {
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Frequently Asked Questions</h3>
       <div className="space-y-2">
         {faqs.map((faq, index) => (
-          <div key={index} className="border border-gray-200 rounded-lg">
+          <div key={index} className="border border-gray-200 rounded-box">
             <button
               onClick={() => toggleFAQ(index)}
               className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
@@ -29,7 +29,7 @@ export default function FAQAccordion({ faqs = [] }) {
                 <ChevronDown className="w-5 h-5 text-gray-500" />
               )}
             </button>
-            
+
             {openIndex === index && (
               <div className="px-4 pb-4">
                 <p className="text-gray-600 leading-relaxed">{faq.answer}</p>

@@ -3,8 +3,13 @@ import { connectDB } from '@/lib/db';
 import UserModel from '@/models/User';
 import OrderModel from '@/models/Order';
 import ProductModel from '@/models/Product';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
@@ -14,7 +19,7 @@ export async function GET(request: NextRequest) {
     // Calculate date range
     const now = new Date();
     let startDate = new Date();
-    
+
     switch (period) {
       case '24h':
         startDate.setDate(now.getDate() - 1);
@@ -48,16 +53,16 @@ export async function GET(request: NextRequest) {
 
     // User growth by day (for chart)
     const userGrowth = await UserModel.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           role: 'user',
-          createdAt: { $gte: startDate } 
-        } 
+          createdAt: { $gte: startDate }
+        }
       },
       {
         $group: {
-          _id: { 
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } 
+          _id: {
+            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
           },
           count: { $sum: 1 }
         }
@@ -113,8 +118,8 @@ export async function GET(request: NextRequest) {
       },
       {
         $group: {
-          _id: { 
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } 
+          _id: {
+            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
           },
           orders: { $sum: 1 },
           revenue: { $sum: '$totalAmount' }
@@ -171,8 +176,8 @@ export async function GET(request: NextRequest) {
 
     const previousPeriodRevenue = await OrderModel.aggregate([
       {
-        $match: { 
-          createdAt: { $gte: previousPeriodStart, $lt: startDate } 
+        $match: {
+          createdAt: { $gte: previousPeriodStart, $lt: startDate }
         }
       },
       {
@@ -192,11 +197,11 @@ export async function GET(request: NextRequest) {
     const currentRevenue = periodRevenue[0]?.revenue || 0;
     const prevRevenue = previousPeriodRevenue[0]?.revenue || 0;
     const revenueGrowth = prevRevenue > 0 ? parseFloat(((currentRevenue - prevRevenue) / prevRevenue * 100).toFixed(1)) : 0;
-    
-    const orderGrowth = previousPeriodOrders > 0 ? 
+
+    const orderGrowth = previousPeriodOrders > 0 ?
       parseFloat(((newOrders - previousPeriodOrders) / previousPeriodOrders * 100).toFixed(1)) : 0;
-    
-    const userGrowthPercent = previousPeriodUsers > 0 ? 
+
+    const userGrowthPercent = previousPeriodUsers > 0 ?
       parseFloat(((newUsers - previousPeriodUsers) / previousPeriodUsers * 100).toFixed(1)) : 0;
 
     return NextResponse.json({

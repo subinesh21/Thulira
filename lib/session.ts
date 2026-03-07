@@ -6,8 +6,13 @@ export interface SessionData {
   isLoggedIn: boolean;
 }
 
+// Warn if SESSION_SECRET is not explicitly set
+if (!process.env.SESSION_SECRET) {
+  console.warn('[SECURITY WARNING] SESSION_SECRET is not set. Using an insecure default. Set SESSION_SECRET in .env.local!');
+}
+
 const defaultOptions: SessionOptions = {
-  password: process.env.SESSION_SECRET || 'complex_password_at_least_32_characters_long',
+  password: process.env.SESSION_SECRET || 'Xk9$mP2vL7wQ4nR8jF5sY1bA3cE6hG0t',
   cookieName: 'thulira-session',
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',

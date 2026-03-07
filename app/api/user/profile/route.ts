@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import UserModel from '@/models/User';
+import { getSession } from '@/lib/session';
 
 // GET /api/user/profile - Get user profile
 export async function GET(request: NextRequest) {
@@ -9,8 +10,6 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-
-    console.log('GET /api/user/profile - userId:', userId);
 
     if (!userId) {
       return NextResponse.json(
@@ -21,11 +20,11 @@ export async function GET(request: NextRequest) {
 
     // FIX: Use type assertion for UserModel
     const User = UserModel as any;
-    
+
     // Find user by uid (Firebase UID) since that's what we're using
     const user = await User.findOne({ uid: userId }).lean();
 
-    console.log('User found:', user ? 'Yes' : 'No');
+
 
     if (!user) {
       // Return empty profile instead of 404 to allow creation
@@ -85,8 +84,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, name, email } = body;
 
-    console.log('POST /api/user/profile - Create profile request:', { userId, name, email });
-
     if (!userId || !name || !email) {
       return NextResponse.json(
         { success: false, message: 'User ID, name, and email are required' },
@@ -96,14 +93,14 @@ export async function POST(request: NextRequest) {
 
     // FIX: Use type assertion for UserModel
     const User = UserModel as any;
-    
+
     // Check if user already exists by uid
     let user = await User.findOne({ uid: userId });
 
     if (!user) {
       // Check if user exists by email
       user = await User.findOne({ email });
-      
+
       if (user) {
         // Update existing user with Firebase UID
         user.uid = userId;
@@ -129,8 +126,8 @@ export async function POST(request: NextRequest) {
           updatedAt: new Date(),
         });
       }
-      
-      console.log('User created/updated:', user._id);
+
+
     }
 
     return NextResponse.json({
@@ -162,11 +159,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { userId, shippingAddress, name } = body;
 
-    console.log('PATCH /api/user/profile - Update profile request:', { 
-      userId, 
-      shippingAddress, 
-      name 
-    });
+
 
     if (!userId) {
       return NextResponse.json(
@@ -200,19 +193,19 @@ export async function PATCH(request: NextRequest) {
 
     // FIX: Use type assertion for UserModel
     const User = UserModel as any;
-    
+
     // Find user by uid (Firebase UID)
     let user = await User.findOne({ uid: userId });
 
     // If user doesn't exist, create one
     if (!user) {
-      console.log('User not found, creating new user:', userId);
-      
+
+
       // Try to find by email if provided in body
       if (body.email) {
         user = await User.findOne({ email: body.email });
       }
-      
+
       if (user) {
         // Update existing user with Firebase UID
         user.uid = userId;
@@ -261,7 +254,7 @@ export async function PATCH(request: NextRequest) {
     user.updatedAt = new Date();
     await user.save();
 
-    console.log('Profile updated successfully for user:', user._id);
+
 
     return NextResponse.json({
       success: true,

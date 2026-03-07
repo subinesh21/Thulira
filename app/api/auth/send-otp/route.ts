@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import { generateOTP, sendEmail, generateOTPHTML } from '@/lib/email';
@@ -9,9 +10,9 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    
+
     const { email, name, password } = await request.json();
-    
+
     // Validate input
     if (!email || !name || !password) {
       return NextResponse.json(
@@ -19,11 +20,11 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     // Check if user already exists
     const UserModel = User as any;
     const existingUser = await UserModel.findOne({ email });
-    
+
     if (existingUser) {
       if (existingUser.isVerified) {
         return NextResponse.json(
@@ -35,11 +36,11 @@ export async function POST(request: NextRequest) {
         // Continue with OTP generation
       }
     }
-    
+
     // Generate OTP
     const otp = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-    
+
     // Save OTP to user (create temporary user if doesn't exist)
     let user;
     if (existingUser && !existingUser.isVerified) {
@@ -50,13 +51,17 @@ export async function POST(request: NextRequest) {
     } else {
       // Generate a unique ID for the user
       const userId = new mongoose.Types.ObjectId().toString();
-      
+
+      // Hash password manually for safety
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
       const newUser = new UserModel({
         _id: userId,
         uid: userId,
         name,
         email,
-        password,
+        password: hashedPassword,
         role: 'user',
         otp,
         otpExpires,
@@ -64,7 +69,7 @@ export async function POST(request: NextRequest) {
       });
       user = await newUser.save();
     }
-    
+
     // Send OTP email
     try {
       const emailHtml = generateOTPHTML(otp, 'registration');
@@ -73,7 +78,7 @@ export async function POST(request: NextRequest) {
         subject: 'Account Verification OTP',
         html: emailHtml
       });
-      
+
       return NextResponse.json({
         message: 'OTP sent successfully',
         userId: user._id.toString(),
@@ -86,10 +91,10 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
   } catch (error: any) {
     console.error('Send OTP error:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err: any) => err.message);
       return NextResponse.json(
@@ -97,7 +102,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

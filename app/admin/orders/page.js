@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShoppingCart, 
-  Search, 
-  Filter, 
-  Package, 
-  Truck, 
-  CheckCircle, 
-  XCircle, 
+import {
+  ShoppingCart,
+  Search,
+  Filter,
+  Package,
+  Truck,
+  CheckCircle,
+  XCircle,
   Clock,
   ChevronDown,
   ChevronUp,
@@ -48,18 +48,18 @@ export default function AdminOrdersPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (statusFilter !== 'all') {
         params.set('status', statusFilter);
       }
-      
+
       const queryString = params.toString();
       const url = `/api/admin/orders${queryString ? `?${queryString}` : ''}`;
-      
+
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (response.ok) {
         setOrders(data.orders || []);
       } else {
@@ -76,17 +76,17 @@ export default function AdminOrdersPage() {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       setUpdatingStatus(orderId);
-      
+
       const response = await fetch('/api/admin/orders', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, status: newStatus }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        setOrders(prev => prev.map(order => 
+        setOrders(prev => prev.map(order =>
           order.id === orderId ? { ...order, status: newStatus } : order
         ));
       } else {
@@ -128,7 +128,7 @@ export default function AdminOrdersPage() {
     <AdminLayout>
       <div className="space-y-3 sm:space-y-4">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between"
@@ -137,14 +137,14 @@ export default function AdminOrdersPage() {
             <h1 className="text-base sm:text-lg font-bold text-gray-900">Orders</h1>
             <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">Manage customer orders</p>
           </div>
-          <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-white px-2 py-1 rounded border border-gray-200">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-white px-2 py-1 rounded-box border border-gray-200">
             <ShoppingCart className="w-3 h-3 text-[#52dd28ff]" />
             <span className="font-medium text-gray-900">{orders.length}</span>
           </div>
         </motion.div>
 
         {/* Filters */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-2"
@@ -157,17 +157,17 @@ export default function AdminOrdersPage() {
               placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-7 sm:pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white"
+              className="w-full pl-7 sm:pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-box focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white"
             />
           </div>
-          
+
           {/* Status Filter */}
           <div className="relative">
             <Filter className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 w-3 h-3 sm:w-4 sm:h-4" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-7 sm:pl-8 pr-6 py-2 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] appearance-none bg-white"
+              className="w-full pl-7 sm:pl-8 pr-6 py-2 text-xs border border-gray-200 rounded-box focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] appearance-none bg-white"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -183,11 +183,11 @@ export default function AdminOrdersPage() {
         {/* Error Message */}
         <AnimatePresence>
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="bg-red-50 border border-red-200 rounded-lg p-2 text-xs text-red-700"
+              className="bg-red-50 border border-red-200 rounded-box p-2 text-xs text-red-700"
             >
               {error}
             </motion.div>
@@ -195,7 +195,7 @@ export default function AdminOrdersPage() {
         </AnimatePresence>
 
         {/* Orders List */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-box border border-gray-200 overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="w-6 h-6 border-2 border-[#52dd28ff] border-t-transparent rounded-full animate-spin"></div>
@@ -211,7 +211,7 @@ export default function AdminOrdersPage() {
                 const status = statusConfig[order.status];
                 const StatusIcon = status.icon;
                 const isExpanded = expandedOrder === order.id;
-                
+
                 return (
                   <motion.div
                     key={order.id}
@@ -221,7 +221,7 @@ export default function AdminOrdersPage() {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     {/* Order Header */}
-                    <div 
+                    <div
                       className="p-3 cursor-pointer"
                       onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                     >
@@ -263,7 +263,7 @@ export default function AdminOrdersPage() {
                           <div className="p-3 space-y-3">
                             {/* Customer & Shipping */}
                             <div className="grid grid-cols-1 gap-2">
-                              <div className="bg-white p-2 rounded border border-gray-200">
+                              <div className="bg-white p-2 rounded-box border border-gray-200">
                                 <h4 className="text-[10px] font-semibold text-gray-900 mb-2 flex items-center gap-1">
                                   <User className="w-3 h-3 text-[#52dd28ff]" />
                                   Customer
@@ -279,7 +279,7 @@ export default function AdminOrdersPage() {
                                 </p>
                               </div>
 
-                              <div className="bg-white p-2 rounded border border-gray-200">
+                              <div className="bg-white p-2 rounded-box border border-gray-200">
                                 <h4 className="text-[10px] font-semibold text-gray-900 mb-2 flex items-center gap-1">
                                   <MapPin className="w-3 h-3 text-[#52dd28ff]" />
                                   Shipping
@@ -292,15 +292,15 @@ export default function AdminOrdersPage() {
                             </div>
 
                             {/* Order Items */}
-                            <div className="bg-white p-2 rounded border border-gray-200">
+                            <div className="bg-white p-2 rounded-box border border-gray-200">
                               <h4 className="text-[10px] font-semibold text-gray-900 mb-2">Items ({getTotalItems(order.items)})</h4>
                               <div className="space-y-2">
                                 {order.items?.map((item, idx) => (
                                   <div key={idx} className="flex items-center gap-2">
-                                    <img 
-                                      src={item.image} 
+                                    <img
+                                      src={item.image}
                                       alt={item.name}
-                                      className="w-6 h-6 object-cover rounded"
+                                      className="w-6 h-6 object-cover rounded-box"
                                     />
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[8px] font-medium text-gray-900 truncate">{item.name}</p>
@@ -321,11 +321,10 @@ export default function AdminOrdersPage() {
                                   key={key}
                                   onClick={() => updateOrderStatus(order.id, key)}
                                   disabled={updatingStatus === order.id || order.status === key}
-                                  className={`px-2 py-1 rounded text-[8px] font-medium ${
-                                    order.status === key
+                                  className={`px-2 py-1 rounded text-[8px] font-medium ${order.status === key
                                       ? config.color
                                       : 'bg-white border border-gray-200 text-gray-600'
-                                  } disabled:opacity-50`}
+                                    } disabled:opacity-50`}
                                 >
                                   {updatingStatus === order.id ? '...' : config.label}
                                 </button>

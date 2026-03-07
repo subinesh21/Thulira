@@ -18,26 +18,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Build query - using string IDs, not ObjectId
-    const query: any = { 
+    const query: any = {
       $or: [
         { 'user.id': userId },
         { 'user.uid': userId }
       ]
     };
-    
+
     if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
       query.status = status;
     }
 
-    console.log('Fetching orders for userId:', userId);
-    console.log('Query:', JSON.stringify(query));
 
     // Fetch orders sorted by newest first
     const orders = await OrderModel.find(query)
       .sort({ createdAt: -1 })
       .lean();
-    
-    console.log('Found orders:', orders.length);
+
 
     // Format orders for response
     const formattedOrders = orders.map((order: any) => ({
@@ -73,7 +70,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    console.log('Received order request:', body);
+    console.log('Received order request');
 
     const { user, items, totalAmount, shippingAddress, paymentMethod = 'cod' } = body;
 
@@ -99,13 +96,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!shippingAddress || 
-        !shippingAddress.fullName || 
-        !shippingAddress.address || 
-        !shippingAddress.city || 
-        !shippingAddress.state || 
-        !shippingAddress.zipCode || 
-        !shippingAddress.phone) {
+    if (!shippingAddress ||
+      !shippingAddress.fullName ||
+      !shippingAddress.address ||
+      !shippingAddress.city ||
+      !shippingAddress.state ||
+      !shippingAddress.zipCode ||
+      !shippingAddress.phone) {
       return NextResponse.json(
         { success: false, message: 'Complete shipping address is required' },
         { status: 400 }
@@ -151,10 +148,10 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date(),
     });
 
-    console.log('Order created successfully:', order._id);
+
 
     return NextResponse.json(
-      { 
+      {
         success: true,
         message: 'Order placed successfully',
         order: {
@@ -169,13 +166,13 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Error creating order:', error);
-    
+
     if (error.name === 'ValidationError') {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Validation error', 
-          errors: Object.values(error.errors).map((e: any) => e.message) 
+        {
+          success: false,
+          message: 'Validation error',
+          errors: Object.values(error.errors).map((e: any) => e.message)
         },
         { status: 400 }
       );

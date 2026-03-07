@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Package, 
-  ShoppingCart, 
-  FileText, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  Package,
+  ShoppingCart,
+  FileText,
+  BarChart3,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }) {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -76,7 +76,7 @@ export default function AdminLayout({ children }) {
           <p className="text-sm sm:text-base text-gray-600 mb-4">You don't have permission to access the admin panel.</p>
           <button
             onClick={() => router.push('/')}
-            className="px-4 py-2 bg-[#52dd28ff] text-white rounded text-sm sm:text-base font-medium hover:bg-[#45b824] transition-colors"
+            className="px-4 py-2 bg-[#52dd28ff] text-white rounded-box text-sm sm:text-base font-medium hover:bg-[#45b824] transition-colors"
           >
             Go to Home
           </button>
@@ -101,7 +101,7 @@ export default function AdminLayout({ children }) {
                 onClick={() => setSidebarOpen(false)}
               />
             )}
-            
+
             {/* Sidebar */}
             <motion.aside
               initial={{ x: -280 }}
@@ -123,7 +123,7 @@ export default function AdminLayout({ children }) {
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-1.5 rounded-md hover:bg-gray-100 transition-colors lg:hidden"
+                  className="p-1.5 rounded-box hover:bg-gray-100 transition-colors lg:hidden"
                 >
                   <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                 </button>
@@ -131,7 +131,7 @@ export default function AdminLayout({ children }) {
 
               {/* User Info */}
               <div className="p-3 sm:p-4 border-b border-gray-200">
-                <div className="flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-lg transition-colors duration-300">
+                <div className="flex items-center space-x-3 hover:bg-gray-50 p-2 rounded-box transition-colors duration-300">
                   <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                   </div>
@@ -151,25 +151,23 @@ export default function AdminLayout({ children }) {
                 {sidebarItems.map((item) => {
                   const isActive = pathname === item.href;
                   const Icon = item.icon;
-                  
+
                   return (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        onClick={() => setSidebarOpen(false)}
-                        className={`flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? 'bg-[#52dd28ff] text-white' 
-                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium rounded-box transition-all duration-200 ${isActive
+                        ? 'bg-[#52dd28ff] text-white'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                         }`}
-                      >
-                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 ${
-                          isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'
+                    >
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'
                         }`} />
-                        <span className={isActive ? 'text-white' : 'text-gray-800'}>
-                          {item.name}
-                        </span>
-                      </a>
+                      <span className={isActive ? 'text-white' : 'text-gray-800'}>
+                        {item.name}
+                      </span>
+                    </a>
                   );
                 })}
               </nav>
@@ -179,7 +177,7 @@ export default function AdminLayout({ children }) {
                 <button
                   onClick={logout}
                   disabled={isLoading}
-                  className="w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                  className="w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-red-600 hover:bg-red-50 rounded-box transition-colors duration-200 disabled:opacity-50"
                 >
                   <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-3" />
                   Logout
@@ -198,7 +196,7 @@ export default function AdminLayout({ children }) {
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-1.5 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 mr-2 transition-colors duration-200"
+                className="lg:hidden p-1.5 rounded-box text-gray-500 hover:text-gray-900 hover:bg-gray-100 mr-2 transition-colors duration-200"
               >
                 <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
@@ -206,7 +204,7 @@ export default function AdminLayout({ children }) {
                 {sidebarItems.find(item => item.href === pathname)?.name || 'Dashboard'}
               </h2>
             </div>
-            
+
             <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="hidden sm:block text-sm sm:text-base text-gray-500">
                 {user?.name?.split(' ')[0]}

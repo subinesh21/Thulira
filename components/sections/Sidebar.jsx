@@ -143,6 +143,7 @@ export default function Sidebar() {
                 <li key={item.name} style={{ marginBottom: 'clamp(10px, 2.5vh, 30px)' }}>
                   <a
                     href={item.href}
+                    className="group"
                     style={{
                       fontFamily: 'var(--font-cinzel), serif',
                       fontSize: '14px',
@@ -151,19 +152,15 @@ export default function Sidebar() {
                       color: pathname === item.href ? '#52dd28ff' : '#131212',
                       letterSpacing: '2px',
                       transition: 'all 0.3s ease',
-                      display: 'inline-block',
+                      display: 'flex',
+                      alignItems: 'center',
                       position: 'relative',
                       textDecoration: 'none'
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#52dd28ff';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (pathname !== item.href) {
-                        e.currentTarget.style.color = '#131212';
-                      }
-                    }}
                   >
+                    <span
+                      className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${pathname === item.href ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`}
+                    />
                     {item.name === 'Cart' ? `${item.name} (${cartCount})` : item.name}
                   </a>
                 </li>
@@ -182,11 +179,13 @@ export default function Sidebar() {
           <div style={{ marginLeft: '16px', marginBottom: '4px', minHeight: '44px' }}>
             {!isSearchActive ? (
               <div
-                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '10px 0' }}
+                className="group"
+                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '10px 0', position: 'relative' }}
                 onClick={() => setIsSearchActive(true)}
               >
+                <span className="w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100 transition-all duration-300" />
                 <Search style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b' }} />
-                <span className="search-text-hover" style={{ fontSize: '14px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Search</span>
+                <span className="search-text-hover font-mono" style={{ fontSize: '14px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Search</span>
               </div>
             ) : (
               <form
@@ -233,7 +232,7 @@ export default function Sidebar() {
           <div style={{ marginLeft: '16px', marginBottom: '8px', display: 'flex', flexDirection: 'column-reverse' }}>
             <button
               onClick={() => setIsMoreOpen(!isMoreOpen)}
-              className="more-dropdown-btn"
+              className="more-dropdown-btn group"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -243,11 +242,13 @@ export default function Sidebar() {
                 border: 'none',
                 cursor: 'pointer',
                 padding: '10px 0',
+                position: 'relative',
                 transition: 'color 0.3s ease'
               }}
             >
+              <span className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${isMoreOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`} />
               <MoreHorizontal style={{ width: '20px', height: '20px', marginRight: '16px', color: '#6b6b6b', transition: 'color 0.3s ease' }} />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>More</span>
+              <span className="font-mono" style={{ fontSize: '14px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>More</span>
               <ChevronDown
                 style={{
                   width: '16px',
@@ -273,31 +274,35 @@ export default function Sidebar() {
             >
               <a
                 href="/blogs"
-                className="more-dropdown-item"
+                className="more-dropdown-item group"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   padding: '8px 0',
                   textDecoration: 'none',
+                  position: 'relative',
                   transition: 'color 0.3s ease'
                 }}
               >
+                <span className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${pathname === '/blogs' ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`} />
                 <FileText style={{ width: '18px', height: '18px', marginRight: '14px', color: '#6b6b6b', transition: 'color 0.3s ease' }} />
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Blogs</span>
+                <span className="font-mono" style={{ fontSize: '13px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Blogs</span>
               </a>
               <a
                 href="/wishlist"
-                className="more-dropdown-item"
+                className="more-dropdown-item group"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   padding: '8px 0',
                   textDecoration: 'none',
+                  position: 'relative',
                   transition: 'color 0.3s ease'
                 }}
               >
+                <span className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${pathname === '/wishlist' ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`} />
                 <Heart style={{ width: '18px', height: '18px', marginRight: '14px', color: '#6b6b6b', transition: 'color 0.3s ease' }} />
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Wishlist</span>
+                <span className="font-mono" style={{ fontSize: '13px', fontWeight: 500, color: '#131212', transition: 'color 0.3s ease' }}>Wishlist</span>
               </a>
             </div>
           </div>
@@ -308,13 +313,16 @@ export default function Sidebar() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <a
                   href={getAccountLink()}
+                  className="font-mono group"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     color: '#52dd28ff',
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    position: 'relative'
                   }}
                 >
+                  <span className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${pathname === getAccountLink() ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`} />
                   <i className="fa fa-user" style={{ marginRight: '16px', color: '#52dd28ff' }}></i>
                   Hi, {user?.name?.split(' ')[0]}
                   {user?.role === 'admin' && (
@@ -322,7 +330,7 @@ export default function Sidebar() {
                   )}
                 </a>
                 <button
-                  className="logout-btn"
+                  className="logout-btn font-mono group"
                   onClick={logout}
                   style={{
                     display: 'flex',
@@ -333,6 +341,7 @@ export default function Sidebar() {
                     border: 'none',
                     cursor: 'pointer',
                     padding: 0,
+                    position: 'relative',
                     transition: 'color 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
@@ -346,6 +355,7 @@ export default function Sidebar() {
                     if (icon) icon.style.color = '';
                   }}
                 >
+                  <span className="w-4 h-[2px] rounded-full bg-[#ff0000] absolute -left-5 opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100 transition-all duration-300 transform origin-center" />
                   <i className="fa fa-sign-out" style={{ marginRight: '16px', transition: 'color 0.3s ease' }}></i>
                   Logout
                 </button>
@@ -353,14 +363,17 @@ export default function Sidebar() {
             ) : (
               <a
                 href="/account"
+                className="font-mono group"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   fontSize: '14px',
                   color: '#52dd28ff',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  position: 'relative'
                 }}
               >
+                <span className={`w-4 h-[2px] rounded-full bg-[#52dd28ff] absolute -left-5 transition-all duration-300 ${pathname === '/account' ? 'opacity-100 scale-100' : 'opacity-0 scale-x-0 origin-left group-hover:opacity-100 group-hover:scale-x-100'}`} />
                 <User style={{ width: '18px', height: '18px', marginRight: '12px', color: '#52dd28ff' }} />
                 Account
               </a>

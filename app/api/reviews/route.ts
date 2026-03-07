@@ -3,6 +3,55 @@ import connectDB from '@/lib/db';
 import ReviewModel from '@/models/Review';
 import ProductModel from '@/models/Product';
 import mongoose from 'mongoose';
+import { PRODUCTS } from '@/lib/product-data';
+
+// Helper to find a product's ObjectId based on either static mapping or Mongo search
+async function ensureProductMongoId(passedId: string) {
+    if (mongoose.Types.ObjectId.isValid(passedId)) {
+        return passedId;
+    }
+
+    const numericId = parseInt(passedId);
+    if (!isNaN(numericId)) {
+        const staticProd = PRODUCTS.find((p) => p.id === numericId || p._id === passedId);
+
+        let prod = await ProductModel.findOne({ id: numericId });
+
+        if (!prod && staticProd) {
+            prod = await ProductModel.findOne({ name: staticProd.name });
+            if (prod) {
+                prod.id = numericId;
+                await prod.save();
+            }
+        }
+
+        if (prod) {
+            return prod._id.toString();
+        } else {
+            // Find static product to use its details
+            const staticProd = PRODUCTS.find((p) => p.id === numericId || p._id === passedId);
+            if (staticProd) {
+                // If it doesn't exist in MongoDB yet, we must create a stub to attach reviews to,
+                // or just attach the review directly to the string ID.
+                // It's safer to create a stub in Mongo so the Review model's ObjectId ref works.
+                const { _id, ...staticProdWithoutId } = staticProd as any;
+
+                // If it's not a valid internal ObjectID yet, DO NOT spread `_id`. 
+                // Let mongoose auto-generate a valid 24-char hex string as the ObjectId.
+                // Just map the static ID to the `id` field.
+
+                const newProd = await ProductModel.create({
+                    ...staticProdWithoutId,
+                    id: staticProd.id || parseInt(staticProd._id),
+                    isActive: (staticProd as any).isActive ?? true,
+                    inStock: staticProd.inStock ?? true,
+                });
+                return newProd._id.toString();
+            }
+        }
+    }
+    return null;
+}
 
 // GET - Fetch reviews for a product
 export async function GET(request: NextRequest) {
@@ -19,15 +68,43 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Validate ObjectId
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
-            return NextResponse.json(
-                { success: false, message: 'Invalid product ID' },
-                { status: 400 }
-            );
+        // Try to find the mapped MongoDB ID first
+        let mongoId = productId;
+        let isValidObjectId = mongoose.Types.ObjectId.isValid(productId);
+
+        const numericId = parseInt(productId);
+        if (!isValidObjectId && !isNaN(numericId)) {
+            let prod = await ProductModel.findOne({ id: numericId });
+
+            if (!prod) {
+                const staticProd = PRODUCTS.find((p) => p.id === numericId || p._id === productId);
+                if (staticProd) {
+                    prod = await ProductModel.findOne({ name: staticProd.name });
+                    if (prod) {
+                        prod.id = numericId;
+                        await prod.save();
+                    }
+                }
+            }
+
+            if (prod) {
+                mongoId = prod._id.toString();
+                isValidObjectId = true;
+            }
         }
 
-        const reviews = await ReviewModel.find({ productId })
+        // If mongoId is still not a valid ObjectId, it means the product doesn't exist in MongoDB yet
+        // Therefore, it has no reviews.
+        if (!isValidObjectId) {
+            return NextResponse.json({
+                success: true,
+                reviews: [],
+                count: 0,
+                averageRating: 0
+            });
+        }
+
+        const reviews = await ReviewModel.find({ productId: mongoId })
             .sort({ createdAt: -1 })
             .lean();
 
@@ -66,13 +143,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
-            return NextResponse.json(
-                { success: false, message: 'Invalid product ID' },
-                { status: 400 }
-            );
-        }
-
         if (rating < 1 || rating > 5) {
             return NextResponse.json(
                 { success: false, message: 'Rating must be between 1 and 5' },
@@ -80,29 +150,28 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if product exists
-        const product = await ProductModel.findById(productId);
-        if (!product) {
+        const resolvedProductId = await ensureProductMongoId(productId);
+        if (!resolvedProductId) {
             return NextResponse.json(
-                { success: false, message: 'Product not found' },
+                { success: false, message: 'Product not found globally' },
                 { status: 404 }
             );
         }
 
         // Create review
         const review = await ReviewModel.create({
-            productId,
+            productId: resolvedProductId,
             reviewerName: reviewerName.trim(),
             rating: Number(rating),
             comment: comment.trim()
         });
 
         // Update product's review count and average rating
-        const allReviews = await ReviewModel.find({ productId });
+        const allReviews = await ReviewModel.find({ productId: resolvedProductId });
         const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
         const avgRating = totalRating / allReviews.length;
 
-        await ProductModel.findByIdAndUpdate(productId, {
+        await ProductModel.findByIdAndUpdate(resolvedProductId, {
             reviews: allReviews.length,
             rating: Math.round(avgRating * 10) / 10
         });

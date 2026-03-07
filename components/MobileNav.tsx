@@ -87,7 +87,7 @@ export default function MobileNav() {
           <button
             ref={menuButtonRef}
             onClick={toggleMenu}
-            className="hover:bg-gray-100 rounded-lg transition-colors relative p-2"
+            className="hover:bg-gray-100 rounded-box transition-colors relative p-2"
             aria-label="Menu"
           >
             <Menu className="w-6 h-6 text-gray-600" />
@@ -112,7 +112,7 @@ export default function MobileNav() {
           {/* Account Button - Always person icon */}
           <Link
             href="/account"
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+            className="relative p-2 hover:bg-gray-100 rounded-box transition-colors group"
             aria-label="Account"
           >
             <User className="w-5 h-5 text-gray-600" />
@@ -121,7 +121,7 @@ export default function MobileNav() {
           {/* Cart Button with Count */}
           <Link
             href="/cart"
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
+            className="relative p-2 hover:bg-gray-100 rounded-box transition-colors group"
             aria-label="Cart"
           >
             <ShoppingCart className="w-5 h-5 text-gray-600" />
@@ -148,7 +148,7 @@ export default function MobileNav() {
               placeholder="Type the keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-full text-sm focus:outline-none focus:border-[#52dd28ff] focus:ring-2 focus:ring-[#52dd28ff]/20 bg-white"
+              className="w-full px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-box text-sm focus:outline-none focus:border-[#52dd28ff] focus:ring-2 focus:ring-[#52dd28ff]/20 bg-white"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -180,7 +180,7 @@ export default function MobileNav() {
           }`}
       >
 
-        <div className="bg-white border border-gray-20 shadow-lg rounded-lg mx-4 overflow-hidden ">
+        <div className="bg-white border border-gray-20 shadow-lg rounded-box mx-4 overflow-hidden ">
           {/* Navigation Links - More compact */}
           <nav className="py-2 ">
             <ul className="divide-y divide-gray-300 mr-8">
@@ -277,7 +277,7 @@ export default function MobileNav() {
               placeholder="Type your keyword..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 text-sm focus:outline-none focus:border-[#52dd28ff] focus:ring-1 focus:ring-[#52dd28ff] bg-white rounded"
+              className="w-full px-4 py-3 border border-gray-300 text-sm focus:outline-none focus:border-[#52dd28ff] focus:ring-1 focus:ring-[#52dd28ff] bg-white rounded-box"
             />
           </form>
         </div>

@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import ProductModel from '@/models/Product';
 import { Types } from 'mongoose';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 /**
- * GET - Fetch all product state overrides
+ * GET - Fetch all product state overrides (admin only)
  * Returns a map of productId -> { inStock, isActive }
  */
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
@@ -18,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     // Convert to map format: { productId: { inStock, isActive } }
     const statesMap: Record<string, { inStock: boolean; isActive: boolean }> = {};
-    
+
     for (const product of products) {
       const productId = product.id?.toString() || product._id.toString();
       statesMap[productId] = {
@@ -36,10 +41,9 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching product states:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'Failed to fetch product states',
-        error: error.message 
       },
       { status: 500 }
     );
@@ -47,10 +51,14 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST - Update product state (inStock or isActive)
+ * POST - Update product state (inStock or isActive) — admin only
  * Creates or updates just the state fields
  */
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
 
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Try to find by numeric ID first, then by _id
     let updatedProduct;
-    
+
     // Check if productId is a valid number for numeric ID search
     const numericId = parseInt(productId);
     if (!isNaN(numericId)) {
@@ -100,7 +108,6 @@ export async function POST(request: NextRequest) {
         price: 0,
         primaryImage: '/images/placeholder.jpg',
         category: 'homeware',
-        brand: 'Thulira',
         description: 'Product details not available',
         inStock: inStock !== undefined ? inStock : true,
         isActive: isActive !== undefined ? isActive : true
@@ -121,10 +128,9 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error updating product state:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'Failed to update product state',
-        error: error.message 
       },
       { status: 500 }
     );

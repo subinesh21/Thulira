@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   // Allow string IDs from Firebase
@@ -82,16 +83,45 @@ const userSchema = new mongoose.Schema({
   autoIndex: false,
 });
 
+// Pre-save hook to hash password
+userSchema.pre('save', async function (next) {
+  const user = this as any;
+
+  if (!user.isModified('password')) {
+    return next();
+  }
+
+  // Check if it's already hashed (starts with $2a$ or $2b$) 
+  // to avoid double hashing from manual hashing in routes
+  if (typeof user.password === 'string' && user.password.startsWith('$2')) {
+    console.log('Password already hashed, skipping hook');
+    return next();
+  }
+
+  try {
+    console.log('Hashing password for user...', user.email);
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+    console.log('Password hashed successfully');
+    next();
+  } catch (error: any) {
+    console.error('Password hashing error:', error);
+    next(error);
+  }
+});
+
 // Add comparePassword method
-userSchema.methods.comparePassword = async function(candidatePassword: string) {
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
   if (!this.password) return false;
-  
-  // For now, we'll do a simple comparison
-  // In production, you should use bcrypt or similar
-  return candidatePassword === this.password;
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 // Create the model
+// In development, we may want to delete the model from cache to apply schema changes
+if (process.env.NODE_ENV === 'development') {
+  delete (mongoose as any).models.User;
+}
+
 const UserModel = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default UserModel;

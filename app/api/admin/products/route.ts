@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Product from '@/models/Product';
-import { getSession } from '@/lib/session';
+import { requireAdmin } from '@/lib/auth-middleware';
 
 export const dynamic = 'force-dynamic';
 
-// GET - Fetch all products or filter by query parameters
+// GET - Fetch all products or filter by query parameters (admin only)
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
-    
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const brand = searchParams.get('brand');
     const inStock = searchParams.get('inStock');
     const isActive = searchParams.get('isActive');
     const search = searchParams.get('search');
-    
+
     // Build query
     let query: any = {};
-    
+
     if (category) query.category = category;
     if (brand) query.brand = brand;
     if (inStock !== null) query.inStock = inStock === 'true';
@@ -27,24 +31,23 @@ export async function GET(request: NextRequest) {
     if (search) {
       query.$text = { $search: search };
     }
-    
+
     // @ts-ignore - Mongoose query union type issue
     const productQuery = Product.find(query);
     const products = await productQuery.sort({ createdAt: -1 }).lean();
-    
+
     return NextResponse.json({
       success: true,
       count: products.length,
       products
     });
-    
+
   } catch (error: any) {
     console.error('Get products error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         message: 'Failed to fetch products',
-        error: error.message 
       },
       { status: 500 }
     );
@@ -53,24 +56,26 @@ export async function GET(request: NextRequest) {
 
 // POST - Create new product (Admin only)
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const adminCheck = await requireAdmin(request);
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   try {
     await connectDB();
-    
-    // TODO: Add proper admin authentication
-    
+
     const body = await request.json();
     const product = new Product(body);
     await product.save();
-    
+
     return NextResponse.json({
       success: true,
       message: 'Product created successfully',
       product
     }, { status: 201 });
-    
+
   } catch (error: any) {
     console.error('Create product error:', error);
-    
+
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err: any) => err.message);
       return NextResponse.json(
@@ -78,7 +83,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       { message: 'Failed to create product' },
       { status: 500 }

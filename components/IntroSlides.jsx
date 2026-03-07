@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 const slides = [
   {
@@ -10,18 +11,6 @@ const slides = [
     subtitle: "Embrace Sustainable Living",
     image: "/images/category-drinkware.png"
   },
-  {
-    id: 2,
-    title: "Eco-Friendly Choices",
-    subtitle: "Products designed with nature in mind",
-    image: "/images/category-tableware.png"
-  },
-  {
-    id: 3,
-    title: "Start Your Journey",
-    subtitle: "Experience nature's touch every day",
-    image: "/images/category-storage.png"
-  }
 ];
 
 export default function IntroSlides() {
@@ -85,13 +74,16 @@ export default function IntroSlides() {
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0 z-0 bg-[#f5f7fa]">
                   <div className="absolute inset-0 bg-black/50 z-10" />
-                  <img 
-                    src={slide.image} 
-                    alt={slide.title} 
-                    className="w-full h-full object-cover" 
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover"
                   />
                 </div>
-                
+
                 {/* Content */}
                 <div className="relative z-20 max-w-2xl w-full">
                   <motion.div
@@ -104,8 +96,8 @@ export default function IntroSlides() {
                       Thulira
                     </h2>
                   </motion.div>
-                  
-                  <motion.h1 
+
+                  <motion.h1
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.8, duration: 0.8 }}
@@ -114,8 +106,8 @@ export default function IntroSlides() {
                   >
                     {slide.title}
                   </motion.h1>
-                  
-                  <motion.p 
+
+                  <motion.p
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 1.1, duration: 0.8 }}
@@ -142,8 +134,8 @@ export default function IntroSlides() {
           {/* Progress Indicators */}
           <div className="absolute bottom-24 z-20 flex gap-3">
             {slides.map((_, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`h-1 rounded-full transition-all duration-500 ${currentSlide === idx ? 'w-8 bg-[#52dd28ff]' : 'w-2 bg-white/30'}`}
               />
             ))}

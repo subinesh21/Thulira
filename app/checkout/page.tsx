@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Script from 'next/script';
-import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, ShoppingBag, CreditCard, MapPin, Phone, User, 
-  CheckCircle, ShoppingCart, AlertCircle, Loader, Truck, 
-  Percent, Mail
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowLeft, ShoppingBag, CreditCard, MapPin, Phone, User,
+  CheckCircle, ShoppingCart, AlertCircle, Loader, Truck,
+  Percent, Mail, Image as ImageIcon, X
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -30,16 +30,31 @@ export default function CheckoutPage() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
-  
+
   // State management
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [pincode, setPincode] = useState('');
   const [deliveryInfo, setDeliveryInfo] = useState<any>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [legalModal, setLegalModal] = useState<'terms' | 'privacy' | null>(null);
+  const [storeSettings, setStoreSettings] = useState<any>(null);
+
+  const handleImageError = (id: string, color?: string | null) => {
+    const key = `${id}-${color || 'default'}`;
+    setImageErrors(prev => ({ ...prev, [key]: true }));
+  };
+
+  const CheckoutImageSkeleton = () => (
+    <div className="w-16 h-16 bg-[#f0f2f5] animate-pulse flex items-center justify-center rounded-box flex-shrink-0">
+      <ImageIcon className="w-6 h-6 text-gray-200" />
+    </div>
+  );
 
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-  
+
   // Shipping info state
   const [shippingInfo, setShippingInfo] = useState({
     fullName: '',
@@ -63,7 +78,7 @@ export default function CheckoutPage() {
       name: item.name,
       price: item.price,
       quantity: item.quantity,
-      category: (item as any).category || 'homeware'
+      category: (item as any).category
     })),
     deliveryCost
   );
@@ -129,6 +144,22 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fetch store settings for T&C and Privacy Policy
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings');
+        const data = await response.json();
+        if (data.success) {
+          setStoreSettings(data.settings);
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   // Load Razorpay SDK
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -163,7 +194,7 @@ export default function CheckoutPage() {
   // Handlers
   const validateForm = () => {
     const newErrors: any = {};
-    
+
     if (!shippingInfo.fullName.trim()) newErrors.fullName = 'Full name is required';
     if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
     if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
@@ -195,7 +226,7 @@ export default function CheckoutPage() {
   const handlePincodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 6);
     setPincode(value);
-    
+
     if (value.length === 6) {
       try {
         const info = DeliveryCalculator.calculateDeliveryCost(value, itemsTotal);
@@ -211,9 +242,14 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error('Please fill all required fields correctly');
+      return;
+    }
+
+    if (!agreedToTerms) {
+      toast.error('Please agree to the Terms & Conditions and Privacy Policy');
       return;
     }
 
@@ -325,7 +361,7 @@ export default function CheckoutPage() {
         const error = response.error;
         toast.error(`Payment failed: ${error.description || 'Please try again'}`);
         setIsPlacingOrder(false);
-        
+
         // Optionally update order status in backend
         fetch('/api/payment/razorpay', {
           method: 'PUT',
@@ -337,7 +373,7 @@ export default function CheckoutPage() {
           })
         }).catch(err => console.error('Error updating failed payment:', err));
       });
-      
+
       razorpay.open();
 
     } catch (error: any) {
@@ -365,10 +401,10 @@ export default function CheckoutPage() {
       if (verifyData.success) {
         // Clear cart and show success
         clearCart();
-        
+
         // Calculate amount from order data
         const amount = ((orderData.pricing?.totalAmount || 0).toFixed(2));
-        
+
         // Redirect to success page with all details
         router.push(
           `/orders/success?orderId=${orderData.orderId}&invoiceNumber=${verifyData.invoiceNumber}&amount=${amount}&dbOrderId=${verifyData.orderId || ''}`
@@ -404,6 +440,43 @@ export default function CheckoutPage() {
     return null;
   }
 
+  const LegalModal = ({ type, onClose, content }: { type: 'terms' | 'privacy', onClose: () => void, content: string }) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-box shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden"
+      >
+        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+          <h3 className="text-xl font-bold text-gray-900">
+            {type === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'}
+          </h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto prose prose-sm max-w-none">
+          {content ? (
+            <div className="whitespace-pre-wrap text-gray-600 leading-relaxed">
+              {content}
+            </div>
+          ) : (
+            <p className="text-gray-400 italic py-10 text-center">Content is currently being updated. Please check back later.</p>
+          )}
+        </div>
+        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-[#52dd28ff] text-white rounded-box font-semibold hover:bg-[#45b824] transition-colors"
+          >
+            Got it
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+
   return (
     <>
       {/* Load Razorpay SDK */}
@@ -418,316 +491,346 @@ export default function CheckoutPage() {
           console.error('Failed to load Razorpay SDK');
         }}
       />
-      
+
       <div className="min-h-screen bg-[#f9fdfa]">
         <MobileNav />
         <Sidebar />
-      
-      {/* Main Content */}
-      <main className="pt-16 lg:pl-64">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          
-          {/* Header */}
-          <div className="mb-8">
-            <Link href="/cart" className="inline-flex items-center text-green-600 hover:text-green-700 mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Cart
-            </Link>
-            <h1 className="text-3xl font-bold text-[#131212]">Checkout</h1>
-          </div>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Column - Forms */}
-            <div className="lg:col-span-2 space-y-6">
-              
-              {/* Shipping Information */}
-              <div className="bg-white rounded-xl border border-[#ebebeb] p-6">
-                <h2 className="text-xl font-semibold text-[#131212] mb-6 flex items-center">
-                  <User className="w-5 h-5 mr-2 text-green-600" />
-                  Shipping Information
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+        {/* Main Content */}
+        <main className="pt-16 lg:pl-[280px]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            {/* Header */}
+            <div className="mb-8">
+              <Link href="/cart" className="inline-flex items-center text-[#52dd28ff] hover:text-[#45b824] mb-4 font-medium transition-colors group">
+                <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                Back to Cart
+              </Link>
+              <h1 className="text-4xl font-bold text-[#131212] tracking-tight">Checkout</h1>
+              <div className="w-20 h-1.5 bg-[#52dd28ff] mt-4 rounded-full"></div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+              {/* Left Column - Forms */}
+              <div className="lg:col-span-2 space-y-6">
+
+                {/* Shipping Information */}
+                <div className="bg-white rounded-2xl border border-[#ebebeb] p-8 shadow-sm hover:shadow-md transition-shadow">
+                  <h2 className="text-2xl font-bold text-[#131212] mb-8 flex items-center">
+                    <User className="w-6 h-6 mr-3 text-[#52dd28ff]" />
+                    Shipping Information
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={shippingInfo.fullName}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.fullName ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="John Doe"
+                      />
+                      {errors.fullName && (
+                        <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={shippingInfo.email}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.email ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="john@example.com"
+                      />
+                      {errors.email && (
+                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={shippingInfo.phone}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.phone ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="9876543210"
+                        maxLength={10}
+                      />
+                      {errors.phone && (
+                        <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        Pincode *
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={shippingInfo.zipCode}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.zipCode ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="123456"
+                        maxLength={6}
+                      />
+                      {errors.zipCode && (
+                        <p className="mt-1 text-xs text-red-500">{errors.zipCode}</p>
+                      )}
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        Address *
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={shippingInfo.address}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.address ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="House No., Street, Area"
+                      />
+                      {errors.address && (
+                        <p className="mt-1 text-xs text-red-500">{errors.address}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={shippingInfo.city}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.city ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="Mumbai"
+                      />
+                      {errors.city && (
+                        <p className="mt-1 text-xs text-red-500">{errors.city}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#131212] mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={shippingInfo.state}
+                        onChange={handleInputChange}
+                        className={`w-full px-4 py-3 border ${errors.state ? 'border-red-500' : 'border-[#ebebeb]'
+                          } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                        placeholder="Maharashtra"
+                      />
+                      {errors.state && (
+                        <p className="mt-1 text-xs text-red-500">{errors.state}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Delivery Information */}
+                <div className="bg-white rounded-2xl border border-[#ebebeb] p-8 shadow-sm hover:shadow-md transition-shadow">
+                  <h2 className="text-2xl font-bold text-[#131212] mb-8 flex items-center">
+                    <Truck className="w-6 h-6 mr-3 text-[#52dd28ff]" />
+                    Delivery Details
+                  </h2>
+
+                  <div className="mb-6">
                     <label className="block text-sm font-medium text-[#131212] mb-1">
-                      Full Name *
+                      Enter Pincode for Delivery Calculation *
                     </label>
                     <input
                       type="text"
-                      name="fullName"
-                      value={shippingInfo.fullName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.fullName ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="John Doe"
-                    />
-                    {errors.fullName && (
-                      <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={shippingInfo.email}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.email ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="john@example.com"
-                    />
-                    {errors.email && (
-                      <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={shippingInfo.phone}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.phone ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="9876543210"
-                      maxLength={10}
-                    />
-                    {errors.phone && (
-                      <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      Pincode *
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={shippingInfo.zipCode}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.zipCode ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="123456"
+                      value={pincode}
+                      onChange={handlePincodeChange}
+                      className={`w-full max-w-xs px-4 py-3 border ${errors.pincode ? 'border-red-500' : 'border-[#ebebeb]'
+                        } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#52dd28ff]/20 focus:border-[#52dd28ff] transition-all bg-gray-50/30`}
+                      placeholder="Enter 6-digit pincode"
                       maxLength={6}
                     />
-                    {errors.zipCode && (
-                      <p className="mt-1 text-xs text-red-500">{errors.zipCode}</p>
+                    {errors.pincode && (
+                      <p className="mt-1 text-xs text-red-500">{errors.pincode}</p>
                     )}
                   </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      Address *
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={shippingInfo.address}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.address ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="House No., Street, Area"
-                    />
-                    {errors.address && (
-                      <p className="mt-1 text-xs text-red-500">{errors.address}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={shippingInfo.city}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.city ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="Mumbai"
-                    />
-                    {errors.city && (
-                      <p className="mt-1 text-xs text-red-500">{errors.city}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-[#131212] mb-1">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={shippingInfo.state}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border ${
-                        errors.state ? 'border-red-500' : 'border-[#ebebeb]'
-                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                      placeholder="Maharashtra"
-                    />
-                    {errors.state && (
-                      <p className="mt-1 text-xs text-red-500">{errors.state}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery Information */}
-              <div className="bg-white rounded-xl border border-[#ebebeb] p-6">
-                <h2 className="text-xl font-semibold text-[#131212] mb-6 flex items-center">
-                  <Truck className="w-5 h-5 mr-2 text-green-600" />
-                  Delivery Details
-                </h2>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-[#131212] mb-1">
-                    Enter Pincode for Delivery Calculation *
-                  </label>
-                  <input
-                    type="text"
-                    value={pincode}
-                    onChange={handlePincodeChange}
-                    className={`w-full max-w-xs px-4 py-2 border ${
-                      errors.pincode ? 'border-red-500' : 'border-[#ebebeb]'
-                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500`}
-                    placeholder="Enter 6-digit pincode"
-                    maxLength={6}
-                  />
-                  {errors.pincode && (
-                    <p className="mt-1 text-xs text-red-500">{errors.pincode}</p>
+                  {deliveryInfo && (
+                    <div className="bg-green-50 border border-green-200 rounded-box p-4">
+                      <div className="flex items-start">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-green-800">
+                            Delivery Available
+                          </p>
+                          <p className="text-sm text-green-600 mt-1">
+                            Estimated Delivery: {deliveryInfo.deliveryDays} business days
+                          </p>
+                          <p className="text-sm text-green-600 mt-1">
+                            Delivery Charges: {deliveryInfo.isFree ? 'FREE' : `₹${deliveryInfo.finalCost}`}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {deliveryInfo && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-green-800">
-                          Delivery Available
-                        </p>
-                        <p className="text-sm text-green-600 mt-1">
-                          Estimated Delivery: {deliveryInfo.deliveryDays} business days
-                        </p>
-                        <p className="text-sm text-green-600 mt-1">
-                          Delivery Charges: {deliveryInfo.isFree ? 'FREE' : `₹${deliveryInfo.finalCost}`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
-            </div>
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-2xl border border-[#ebebeb] p-8 sticky top-24 shadow-sm">
+                  <h2 className="text-2xl font-bold text-[#131212] mb-8 flex items-center border-b border-[#ebebeb] pb-4">
+                    <ShoppingBag className="w-6 h-6 mr-3 text-[#52dd28ff]" />
+                    Order Summary
+                  </h2>
 
-            {/* Right Column - Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-[#ebebeb] p-6 sticky top-8">
-                <h2 className="text-xl font-semibold text-[#131212] mb-6 flex items-center">
-                  <ShoppingBag className="w-5 h-5 mr-2 text-green-600" />
-                  Order Summary
-                </h2>
-
-                {/* Items */}
-                <div className="space-y-3 mb-6">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-3">
-                      <div className="relative w-16 h-16 flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                        <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                          {item.quantity}
-                        </span>
+                  {/* Items */}
+                  <div className="space-y-3 mb-6">
+                    {cartItems.map((item) => (
+                      <div key={item.id} className="flex items-center space-x-4 bg-gray-50/50 p-3 rounded-xl border border-[#f0f0f0] transition-colors hover:bg-white hover:border-[#52dd28ff]/30">
+                        <div className="relative w-16 h-16 flex-shrink-0 shadow-sm rounded-lg overflow-hidden border border-[#ebebeb]">
+                          {imageErrors[`${item._id || item.productId || item.id}-${item.color || 'default'}`] || !item.image ? (
+                            <CheckoutImageSkeleton />
+                          ) : (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover transition-transform hover:scale-110"
+                              onError={() => handleImageError(String(item._id || item.productId || item.id), item.color)}
+                            />
+                          )}
+                          <span className="absolute -top-1 -right-1 bg-[#52dd28ff] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold shadow-md">
+                            {item.quantity}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-[#131212] truncate leading-tight mb-1">
+                            {item.name}
+                          </p>
+                          <p className="text-xs font-medium text-gray-500">
+                            ₹{item.price.toFixed(2)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#131212] truncate">
-                          {item.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          ₹{item.price} × {item.quantity}
-                        </p>
+                    ))}
+                  </div>
+
+                  <div className="border-t border-[#ebebeb] pt-6 space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Subtotal</span>
+                      <span className="font-semibold text-gray-900">₹{itemsTotal.toFixed(2)}</span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Delivery</span>
+                      <span className="font-semibold text-gray-900">
+                        {deliveryInfo ? (deliveryInfo.isFree ? <span className="text-[#52dd28ff]">FREE</span> : `₹${deliveryInfo.finalCost}`) : '-'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">GST (18%)</span>
+                      <span className="font-semibold text-gray-900">₹{gstCalculation.totalGST.toFixed(2)}</span>
+                    </div>
+
+                    <div className="border-t border-[#ebebeb] pt-5 mt-5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-gray-900">Total</span>
+                        <span className="text-2xl font-black text-[#52dd28ff]">₹{totalAmount.toFixed(2)}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                {/* Pricing Breakdown */}
-                <div className="border-t border-[#ebebeb] pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">₹{itemsTotal.toFixed(2)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Delivery</span>
-                    <span className="font-medium">
-                      {deliveryInfo ? (deliveryInfo.isFree ? 'FREE' : `₹${deliveryInfo.finalCost}`) : '-'}
-                    </span>
                   </div>
 
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">GST (18%)</span>
-                    <span className="font-medium">₹{gstCalculation.totalGST.toFixed(2)}</span>
+                  {/* Legal Agreement */}
+                  <div className="mt-6 flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="terms-checkbox"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <label htmlFor="terms-checkbox" className="text-xs text-gray-600 leading-normal cursor-pointer select-none">
+                      I agree to the <button type="button" onClick={() => setLegalModal('terms')} className="text-[#52dd28ff] font-bold hover:underline transition-all">Terms & Conditions</button> and <button type="button" onClick={() => setLegalModal('privacy')} className="text-[#52dd28ff] font-bold hover:underline transition-all">Privacy Policy</button>
+                    </label>
                   </div>
 
-                  <div className="border-t border-[#ebebeb] pt-3 mt-3">
-                    <div className="flex justify-between text-base font-semibold">
-                      <span>Total Amount</span>
-                      <span className="text-green-600">₹{totalAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isPlacingOrder || !deliveryInfo}
+                    className={`w-full mt-8 py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-lg relative overflow-hidden group ${isPlacingOrder || !deliveryInfo
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                      : 'bg-[#52dd28ff] hover:bg-[#45b824] text-white hover:shadow-[#52dd28ff]/30 active:scale-[0.98]'
+                      }`}
+                  >
+                    {isPlacingOrder ? (
+                      <div className="flex items-center justify-center">
+                        <Loader className="w-6 h-6 animate-spin mr-3" />
+                        Processing...
+                      </div>
+                    ) : (
+                      <span className="flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 mr-3" />
+                        Pay ₹{totalAmount.toFixed(2)}
+                      </span>
+                    )}
+                  </button>
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isPlacingOrder || !deliveryInfo}
-                  className={`w-full mt-6 py-3 px-4 rounded-lg font-medium transition-all ${
-                    isPlacingOrder || !deliveryInfo
-                      ? 'bg-gray-300 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
-                  }`}
-                >
-                  {isPlacingOrder ? (
-                    <div className="flex items-center justify-center">
-                      <Loader className="w-5 h-5 animate-spin mr-2" />
-                      Processing...
-                    </div>
-                  ) : (
-                    `Pay ₹${totalAmount.toFixed(2)}`
+                  {!deliveryInfo && (
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Please enter pincode to calculate delivery
+                    </p>
                   )}
-                </button>
-
-                {!deliveryInfo && (
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Please enter pincode to calculate delivery
-                  </p>
-                )}
+                </div>
               </div>
-            </div>
-          </form>
-        </div>
-      </main>
+            </form>
+          </div>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+
+        {/* Legal Modals */}
+        <AnimatePresence>
+          {legalModal === 'terms' && (
+            <LegalModal
+              type="terms"
+              onClose={() => setLegalModal(null)}
+              content={storeSettings?.policies?.termsAndConditions || ''}
+            />
+          )}
+          {legalModal === 'privacy' && (
+            <LegalModal
+              type="privacy"
+              onClose={() => setLegalModal(null)}
+              content={storeSettings?.policies?.privacyPolicy || ''}
+            />
+          )}
+        </AnimatePresence>
+      </div>
     </>
   );
 }

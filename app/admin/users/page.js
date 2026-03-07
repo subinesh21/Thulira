@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, 
-  Search, 
-  Mail, 
-  Calendar, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Users,
+  Search,
+  Mail,
+  Calendar,
+  CheckCircle,
+  XCircle,
   User,
   Shield,
   Clock
@@ -31,18 +31,18 @@ export default function UsersManagement() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (searchTerm) {
         params.set('search', searchTerm);
       }
-      
+
       const queryString = params.toString();
       const url = `/api/admin/users${queryString ? `?${queryString}` : ''}`;
-      
+
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (response.ok) {
         setUsers(data.users || []);
       } else {
@@ -67,17 +67,17 @@ export default function UsersManagement() {
   const toggleUserStatus = async (userId, currentStatus) => {
     try {
       setUpdatingUser(userId);
-      
+
       const response = await fetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, isActive: !currentStatus }),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
-        setUsers(prev => prev.map(user => 
+        setUsers(prev => prev.map(user =>
           user.id === userId ? { ...user, isActive: !currentStatus } : user
         ));
       } else {
@@ -114,7 +114,7 @@ export default function UsersManagement() {
     <AdminLayout>
       <div className="space-y-3 sm:space-y-4">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between"
@@ -123,14 +123,14 @@ export default function UsersManagement() {
             <h1 className="text-base sm:text-lg font-bold text-gray-900">Users</h1>
             <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">Manage registered users</p>
           </div>
-          <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-white px-2 py-1 rounded border border-gray-200">
+          <div className="flex items-center gap-1 text-[10px] sm:text-xs bg-white px-2 py-1 rounded-box border border-gray-200">
             <Users className="w-3 h-3 text-[#52dd28ff]" />
             <span className="font-medium text-gray-900">{users.length}</span>
           </div>
         </motion.div>
 
         {/* Search */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="relative"
@@ -141,18 +141,18 @@ export default function UsersManagement() {
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-7 sm:pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white"
+            className="w-full pl-7 sm:pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-box focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white"
           />
         </motion.div>
 
         {/* Error Message */}
         <AnimatePresence>
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="bg-red-50 border border-red-200 rounded-lg p-2 text-xs text-red-700"
+              className="bg-red-50 border border-red-200 rounded-box p-2 text-xs text-red-700"
             >
               {error}
             </motion.div>
@@ -160,10 +160,10 @@ export default function UsersManagement() {
         </AnimatePresence>
 
         {/* Users List */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+          className="bg-white rounded-box border border-gray-200 overflow-hidden"
         >
           {loading ? (
             <div className="flex items-center justify-center py-8">
@@ -196,11 +196,10 @@ export default function UsersManagement() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <h3 className="text-xs font-semibold text-gray-900 truncate">{user.name}</h3>
-                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium ${
-                          user.isActive 
-                            ? 'bg-green-100 text-green-800' 
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium ${user.isActive
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
-                        }`}>
+                          }`}>
                           {user.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
@@ -218,11 +217,10 @@ export default function UsersManagement() {
                     <button
                       onClick={() => toggleUserStatus(user.id, user.isActive)}
                       disabled={updatingUser === user.id}
-                      className={`px-2 py-1 text-[8px] font-medium rounded whitespace-nowrap ${
-                        user.isActive
+                      className={`px-2 py-1 text-[8px] font-medium rounded-box whitespace-nowrap ${user.isActive
                           ? 'text-red-600 bg-red-50 border border-red-200'
                           : 'text-green-600 bg-green-50 border border-green-200'
-                      } disabled:opacity-50`}
+                        } disabled:opacity-50`}
                     >
                       {updatingUser === user.id ? '...' : (user.isActive ? 'Deactivate' : 'Activate')}
                     </button>

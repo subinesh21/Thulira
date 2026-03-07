@@ -158,7 +158,7 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white rounded-box shadow p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
@@ -168,7 +168,7 @@ export default function AdminProductsPage() {
                 placeholder="Search by name or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-box focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 
@@ -178,7 +178,7 @@ export default function AdminProductsPage() {
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-box focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none"
               >
                 <option value="all">All Categories</option>
                 {categories.map(cat => (
@@ -191,7 +191,7 @@ export default function AdminProductsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-box focus:ring-2 focus:ring-green-500 focus:border-transparent"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -203,7 +203,7 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Products Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-box shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -238,7 +238,7 @@ export default function AdminProductsPage() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <img
-                            className="h-10 w-10 rounded-lg object-cover"
+                            className="h-10 w-10 rounded-box object-cover"
                             src={product.primaryImage}
                             alt={product.name}
                           />
@@ -254,7 +254,7 @@ export default function AdminProductsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-box bg-blue-100 text-blue-800">
                         {product.category}
                       </span>
                     </td>
@@ -269,19 +269,19 @@ export default function AdminProductsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
                         {product.isRemoved ? (
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-box bg-red-100 text-red-800">
                             Removed
                           </span>
                         ) : !product.inStock ? (
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-box bg-yellow-100 text-yellow-800">
                             Out of Stock
                           </span>
                         ) : !product.isActive ? (
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-box bg-gray-100 text-gray-800">
                             Hidden
                           </span>
                         ) : (
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-box bg-green-100 text-green-800">
                             Active
                           </span>
                         )}
@@ -302,8 +302,8 @@ export default function AdminProductsPage() {
                             <button
                               onClick={() => handleToggleVisibility(product._id, product.isActive)}
                               className={`p-2 rounded-full transition-colors ${product.isActive
-                                  ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
-                                  : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+                                ? 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                                : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
                                 }`}
                               title={product.isActive ? 'Hide product' : 'Show product'}
                             >
@@ -317,8 +317,8 @@ export default function AdminProductsPage() {
                             <button
                               onClick={() => handleToggleStock(product._id, product.inStock)}
                               className={`p-2 rounded-full transition-colors ${product.inStock
-                                  ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
-                                  : 'text-green-600 hover:text-green-800 hover:bg-green-50'
+                                ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
+                                : 'text-green-600 hover:text-green-800 hover:bg-green-50'
                                 }`}
                               title={product.inStock ? 'Mark out of stock' : 'Mark in stock'}
                             >
@@ -354,7 +354,7 @@ export default function AdminProductsPage() {
                   <button
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    className="px-3 py-1 border border-gray-300 rounded-box disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -364,7 +364,7 @@ export default function AdminProductsPage() {
                   <button
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    className="px-3 py-1 border border-gray-300 rounded-box disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -376,22 +376,22 @@ export default function AdminProductsPage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-box shadow p-4">
             <div className="text-sm font-medium text-gray-500">Total Products</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-box shadow p-4">
             <div className="text-sm font-medium text-gray-500">Active</div>
             <div className="text-2xl font-bold text-green-600 mt-1">
               {products.filter(p => p.isActive && p.inStock && !p.isRemoved).length}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-box shadow p-4">
             <div className="text-sm font-medium text-gray-500">Out of Stock</div>
             <div className="text-2xl font-bold text-yellow-600 mt-1">
               {products.filter(p => !p.inStock).length}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-box shadow p-4">
             <div className="text-sm font-medium text-gray-500">Hidden</div>
             <div className="text-2xl font-bold text-gray-600 mt-1">
               {products.filter(p => !p.isActive && !p.isRemoved).length}

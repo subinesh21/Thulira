@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  ShoppingCart, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  ShoppingCart,
   IndianRupee,
   Package,
   Calendar,
@@ -25,7 +25,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 // Simple Bar Chart Component
 function BarChart({ data, labelKey, valueKey, color = 'bg-primary' }) {
   const maxValue = Math.max(...data.map(d => d[valueKey]));
-  
+
   return (
     <div className="space-y-1.5">
       {data.map((item, index) => (
@@ -53,11 +53,11 @@ function BarChart({ data, labelKey, valueKey, color = 'bg-primary' }) {
 // Simple Line Chart Component
 function LineChart({ data, valueKey }) {
   if (data.length === 0) return <div className="text-center text-gray-500 py-6 text-xs">No data available</div>;
-  
+
   const maxValue = Math.max(...data.map(d => d[valueKey]));
   const minValue = Math.min(...data.map(d => d[valueKey]));
   const range = maxValue - minValue || 1;
-  
+
   const points = data.map((d, i) => {
     const x = (i / (data.length - 1 || 1)) * 100;
     const y = 100 - ((d[valueKey] - minValue) / range) * 80 - 10;
@@ -71,13 +71,13 @@ function LineChart({ data, valueKey }) {
         {[0, 25, 50, 75, 100].map(y => (
           <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#e5e7eb" strokeWidth="0.5" />
         ))}
-        
+
         {/* Area fill */}
         <polygon
           points={`0,100 ${points} 100,100`}
           fill="rgba(82, 221, 40, 0.1)"
         />
-        
+
         {/* Line */}
         <polyline
           points={points}
@@ -87,7 +87,7 @@ function LineChart({ data, valueKey }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        
+
         {/* Data points */}
         {data.map((d, i) => {
           const x = (i / (data.length - 1 || 1)) * 100;
@@ -103,7 +103,7 @@ function LineChart({ data, valueKey }) {
           );
         })}
       </svg>
-      
+
       {/* X-axis labels */}
       <div className="flex justify-between text-[8px] sm:text-[10px] text-gray-500 mt-1">
         {data.filter((_, i) => i % Math.ceil(data.length / 4) === 0 || i === data.length - 1).map((d, i) => (
@@ -120,7 +120,7 @@ function StatCard({ title, value, subtitle, trend, trendUp, icon: Icon }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-3 sm:p-4 rounded-lg border border-gray-200"
+      className="bg-white p-3 sm:p-4 rounded-box border border-gray-200"
     >
       <div className="flex items-start justify-between">
         <div>
@@ -128,7 +128,7 @@ function StatCard({ title, value, subtitle, trend, trendUp, icon: Icon }) {
           <h3 className="text-sm sm:text-base font-bold text-gray-900">{value}</h3>
           {subtitle && <p className="text-[8px] sm:text-[10px] text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
-        <div className="p-1.5 sm:p-2 bg-[#52dd28ff]/10 rounded-lg">
+        <div className="p-1.5 sm:p-2 bg-[#52dd28ff]/10 rounded-box">
           <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-[#52dd28ff]" />
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function AnalyticsDashboard() {
       setLoading(true);
       const response = await fetch(`/api/admin/analytics?period=${period}`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setAnalytics(data);
       }
@@ -227,12 +227,12 @@ export default function AnalyticsDashboard() {
             <h1 className="text-base sm:text-lg font-bold text-gray-900">Analytics</h1>
             <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">Business performance metrics</p>
           </div>
-          
+
           {/* Period Selector */}
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white w-24"
+            className="px-2 py-1.5 text-xs border border-gray-200 rounded-box focus:ring-1 focus:ring-[#52dd28ff] focus:border-[#52dd28ff] bg-white w-24"
           >
             {periods.map(p => (
               <option key={p.value} value={p.value}>{p.label}</option>
@@ -250,7 +250,7 @@ export default function AnalyticsDashboard() {
             trendUp={analytics.revenue?.growth >= 0}
             icon={IndianRupee}
           />
-          
+
           <StatCard
             title="Orders"
             value={formatNumber(analytics.orders?.new || 0)}
@@ -259,7 +259,7 @@ export default function AnalyticsDashboard() {
             trendUp={analytics.orders?.growth >= 0}
             icon={ShoppingCart}
           />
-          
+
           <StatCard
             title="Users"
             value={formatNumber(analytics.users?.new || 0)}
@@ -268,7 +268,7 @@ export default function AnalyticsDashboard() {
             trendUp={analytics.users?.growth >= 0}
             icon={UserPlus}
           />
-          
+
           <StatCard
             title="Avg Order"
             value={formatCurrency(analytics.revenue?.average || 0)}
@@ -282,7 +282,7 @@ export default function AnalyticsDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-3 rounded-lg border border-gray-200"
+            className="bg-white p-3 rounded-box border border-gray-200"
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1">
@@ -291,9 +291,9 @@ export default function AnalyticsDashboard() {
               </h3>
               <span className="text-[8px] text-gray-500">Daily</span>
             </div>
-            <LineChart 
-              data={analytics.orders?.dailyStats || []} 
-              valueKey="revenue" 
+            <LineChart
+              data={analytics.orders?.dailyStats || []}
+              valueKey="revenue"
             />
           </motion.div>
 
@@ -302,7 +302,7 @@ export default function AnalyticsDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="bg-white p-3 rounded-lg border border-gray-200"
+            className="bg-white p-3 rounded-box border border-gray-200"
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1">
@@ -311,9 +311,9 @@ export default function AnalyticsDashboard() {
               </h3>
               <span className="text-[8px] text-gray-500">Daily</span>
             </div>
-            <LineChart 
-              data={analytics.orders?.dailyStats || []} 
-              valueKey="orders" 
+            <LineChart
+              data={analytics.orders?.dailyStats || []}
+              valueKey="orders"
             />
           </motion.div>
         </div>
@@ -325,13 +325,13 @@ export default function AnalyticsDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white p-3 rounded-lg border border-gray-200"
+            className="bg-white p-3 rounded-box border border-gray-200"
           >
             <h3 className="text-xs font-semibold text-gray-900 mb-3 flex items-center gap-1">
               <PieChart className="w-3 h-3 text-[#52dd28ff]" />
               Order Status
             </h3>
-            <BarChart 
+            <BarChart
               data={Object.entries(analytics.orders?.byStatus || {}).map(([status, count]) => ({
                 status: status.slice(0, 3),
                 count
@@ -347,13 +347,13 @@ export default function AnalyticsDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white p-3 rounded-lg border border-gray-200"
+            className="bg-white p-3 rounded-box border border-gray-200"
           >
             <h3 className="text-xs font-semibold text-gray-900 mb-3 flex items-center gap-1">
               <CreditCard className="w-3 h-3 text-[#52dd28ff]" />
               Payment
             </h3>
-            <BarChart 
+            <BarChart
               data={Object.entries(analytics.paymentMethods || {}).map(([method, data]) => ({
                 method: method === 'cod' ? 'COD' : method.slice(0, 3),
                 count: data.count
@@ -369,7 +369,7 @@ export default function AnalyticsDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white p-3 rounded-lg border border-gray-200"
+            className="bg-white p-3 rounded-box border border-gray-200"
           >
             <h3 className="text-xs font-semibold text-gray-900 mb-3 flex items-center gap-1">
               <Box className="w-3 h-3 text-[#52dd28ff]" />
@@ -381,10 +381,10 @@ export default function AnalyticsDashboard() {
                   <span className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center text-[8px] font-medium text-gray-600">
                     {index + 1}
                   </span>
-                  <img 
-                    src={product.image} 
+                  <img
+                    src={product.image}
                     alt={product.name}
-                    className="w-6 h-6 object-cover rounded"
+                    className="w-6 h-6 object-cover rounded-box"
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-medium text-gray-900 truncate">{product.name}</p>
@@ -406,26 +406,26 @@ export default function AnalyticsDashboard() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white p-3 rounded-lg border border-gray-200"
+          className="bg-white p-3 rounded-box border border-gray-200"
         >
           <h3 className="text-xs font-semibold text-gray-900 mb-3 flex items-center gap-1">
             <Package className="w-3 h-3 text-[#52dd28ff]" />
             Inventory
           </h3>
           <div className="grid grid-cols-4 gap-1">
-            <div className="text-center p-2 bg-blue-50 rounded">
+            <div className="text-center p-2 bg-blue-50 rounded-box">
               <p className="text-xs font-bold text-blue-600">{formatNumber(analytics.products?.total || 0)}</p>
               <p className="text-[8px] text-gray-600">Total</p>
             </div>
-            <div className="text-center p-2 bg-green-50 rounded">
+            <div className="text-center p-2 bg-green-50 rounded-box">
               <p className="text-xs font-bold text-green-600">{formatNumber(analytics.products?.active || 0)}</p>
               <p className="text-[8px] text-gray-600">Active</p>
             </div>
-            <div className="text-center p-2 bg-yellow-50 rounded">
+            <div className="text-center p-2 bg-yellow-50 rounded-box">
               <p className="text-xs font-bold text-yellow-600">{formatNumber(analytics.products?.lowStock || 0)}</p>
               <p className="text-[8px] text-gray-600">Low</p>
             </div>
-            <div className="text-center p-2 bg-red-50 rounded">
+            <div className="text-center p-2 bg-red-50 rounded-box">
               <p className="text-xs font-bold text-red-600">{formatNumber(analytics.products?.outOfStock || 0)}</p>
               <p className="text-[8px] text-gray-600">Out</p>
             </div>

@@ -19,11 +19,11 @@ const razorpay = new Razorpay({
 
 export async function POST(request: NextRequest) {
   try {
-    const { 
-      items, 
-      customerInfo, 
-      pincode, 
-      paymentMethod 
+    const {
+      items,
+      customerInfo,
+      pincode,
+      paymentMethod
     } = await request.json();
 
     // Validate required fields
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        category: item.category || 'homeware' // Default to 'homeware' if category not provided
+        category: item.category
       })),
       deliveryCost.finalCost
     );
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        category: item.category || 'homeware',
+        category: item.category,
         total: item.price * item.quantity
       })),
       delivery: {
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       deliveryDays: deliveryCost.deliveryDays,
     });
 
-    console.log('Order created successfully:', newOrder._id);
+
 
     return NextResponse.json({
       success: true,
@@ -181,10 +181,9 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Payment initiation error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'Failed to initiate payment',
-        error: error.message 
       },
       { status: 500 }
     );
@@ -206,10 +205,10 @@ export async function PUT(request: NextRequest) {
 
     // Connect to database
     await connectDB();
-    
+
     // Find the order in database
     const order = await OrderModel.findOne({ razorpayOrderId: razorpay_order_id });
-    
+
     if (!order) {
       return NextResponse.json(
         { success: false, message: 'Order not found' },
@@ -227,12 +226,12 @@ export async function PUT(request: NextRequest) {
       // Update order status to failed
       await OrderModel.findOneAndUpdate(
         { razorpayOrderId: razorpay_order_id },
-        { 
+        {
           status: 'failed',
           'payment.status': 'failed'
         }
       );
-      
+
       return NextResponse.json(
         { success: false, message: 'Invalid payment signature' },
         { status: 400 }
@@ -241,7 +240,7 @@ export async function PUT(request: NextRequest) {
 
     // Fetch Razorpay order details to verify payment status
     const razorpayOrder = await razorpay.orders.fetch(razorpay_order_id);
-    
+
     if (razorpayOrder.status !== 'paid') {
       return NextResponse.json(
         { success: false, message: 'Payment not completed' },
@@ -252,7 +251,7 @@ export async function PUT(request: NextRequest) {
     // Update order with payment details
     const updatedOrder = await OrderModel.findOneAndUpdate(
       { razorpayOrderId: razorpay_order_id },
-      { 
+      {
         razorpayPaymentId: razorpay_payment_id,
         razorpaySignature: razorpay_signature,
         status: 'confirmed',
@@ -268,7 +267,7 @@ export async function PUT(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     // Generate invoice number
     const invoiceNumber = InvoiceGenerator.generateInvoiceNumber();
     const orderDate = InvoiceGenerator.formatDate(new Date());
@@ -307,9 +306,9 @@ export async function PUT(request: NextRequest) {
     if (!emailSent) {
       console.warn('Failed to send order confirmation email');
     }
-    
+
     console.log('Payment verified successfully for order:', razorpay_order_id);
-    
+
     return NextResponse.json({
       success: true,
       message: 'Payment verified successfully',
@@ -321,10 +320,9 @@ export async function PUT(request: NextRequest) {
   } catch (error: any) {
     console.error('Payment verification error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'Payment verification failed',
-        error: error.message 
       },
       { status: 500 }
     );

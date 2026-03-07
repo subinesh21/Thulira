@@ -29,7 +29,7 @@ transporter.verify((error, success) => {
 export async function sendEmail(options: EmailOptions) {
   try {
     const mailOptions = {
-      from: `Thulira <${process.env.EMAIL_USER || 'kannabiran@thulira.com'}>`,
+      from: `Thulira <${process.env.EMAIL_USER || 'support@thulira.com'}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,

@@ -6,6 +6,10 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  id: {
+    type: Number,
+    required: false
+  },
   price: {
     type: Number,
     required: true,
@@ -38,11 +42,6 @@ const productSchema = new mongoose.Schema({
     }
   }],
   category: {
-    type: String,
-    required: true,
-    enum: ['drinkware', 'tableware', 'storage', 'kitchenware', 'homeware', 'bakeware', 'gardenware', 'gifting']
-  },
-  brand: {
     type: String,
     required: true
   },
@@ -92,7 +91,7 @@ productSchema.pre('save', function (next) {
 });
 
 // Index for better query performance
-productSchema.index({ category: 1, brand: 1 });
+productSchema.index({ category: 1, });
 productSchema.index({ name: 'text', description: 'text' });
 
 const ProductModel = mongoose.models.Product || mongoose.model('Product', productSchema);

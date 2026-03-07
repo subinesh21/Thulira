@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import { Minus, Plus, Trash2, ShoppingBag, Image as ImageIcon } from 'lucide-react';
 import Sidebar from '@/components/sections/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
@@ -13,6 +14,18 @@ import { useCart } from '@/context/CartContext';
 export default function CartPage() {
   const { cartItems, cartTotal, updateQuantity, removeFromCart } = useCart();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [imageErrors, setImageErrors] = useState({});
+
+  const handleImageError = (id, color) => {
+    const key = `${id}-${color || 'default'}`;
+    setImageErrors(prev => ({ ...prev, [key]: true }));
+  };
+
+  const CartImageSkeleton = ({ isMobile = false }) => (
+    <div className={`${isMobile ? 'w-20 h-20' : 'w-16 h-16'} bg-[#f0f2f5] animate-pulse flex items-center justify-center flex-shrink-0`}>
+      <ImageIcon className={`${isMobile ? 'w-8 h-8' : 'w-6 h-6'} text-gray-200`} />
+    </div>
+  );
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -42,8 +55,8 @@ export default function CartPage() {
         <div className="flex-1 container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-2xl sm:text-3xl font-bold text-[#131212]">Shopping Cart</h4>
-            <Link 
-              href="/products" 
+            <Link
+              href="/products"
               className="text-[#6b6b6b] text-sm mb-6"
             >
               ← Continue Shopping
@@ -55,9 +68,9 @@ export default function CartPage() {
               <ShoppingBag className="w-14 h-14 text-gray-200 mb-4" />
               <h2 className="text-lg font-semibold text-[#131212] mb-2">Your cart is empty</h2>
               <p className="text-[#6b6b6b] text-sm mb-6">Add products to see them here.</p>
-              <Link 
-                href="/shop" 
-                className="inline-block px-6 py-3 bg-[#52dd28ff] text-white text-sm hover:bg-[#45b824] transition-colors rounded"
+              <Link
+                href="/shop"
+                className="inline-block px-6 py-3 bg-[#52dd28ff] text-white text-sm hover:bg-[#45b824] transition-colors rounded-box"
               >
                 Return to Shop
               </Link>
@@ -76,17 +89,26 @@ export default function CartPage() {
 
                 {/* Cart Items List */}
                 {cartItems.map((item) => (
-                  <div 
-                    key={`${item._id || item.productId || item.id}-${item.color || 'default'}`} 
+                  <div
+                    key={`${item._id || item.productId || item.id}-${item.color || 'default'}`}
                     className="border-b border-[#ebebeb] py-4"
                   >
                     {/* Mobile Layout */}
                     <div className="flex gap-3 sm:hidden">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-20 h-20 object-cover flex-shrink-0" 
-                      />
+                      {imageErrors[`${item._id || item.productId || item.id}-${item.color || 'default'}`] || !item.image ? (
+                        <CartImageSkeleton isMobile={true} />
+                      ) : (
+                        <div className="relative w-20 h-20 flex-shrink-0">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            sizes="80px"
+                            className="object-cover"
+                            onError={() => handleImageError(item._id || item.productId || item.id, item.color)}
+                          />
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#131212] truncate">{item.name}</p>
                         {item.color && (
@@ -95,7 +117,7 @@ export default function CartPage() {
                         <p className="text-sm text-[#52dd28ff] font-semibold mt-1">
                           {formatPrice(item.price)}
                         </p>
-                        
+
                         <div className="flex items-center justify-between mt-2">
                           {/* Quantity Controls */}
                           <div className="flex items-center border border-[#ebebeb]">
@@ -115,7 +137,7 @@ export default function CartPage() {
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
-                          
+
                           {/* Price and Remove */}
                           <div className="flex items-center gap-3">
                             <span className="text-sm font-medium text-[#131212]">
@@ -135,11 +157,20 @@ export default function CartPage() {
                     {/* Desktop Layout */}
                     <div className="hidden sm:grid grid-cols-12 gap-4 items-center">
                       <div className="col-span-6 flex items-center gap-3">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-16 h-16 object-cover" 
-                        />
+                        {imageErrors[`${item._id || item.productId || item.id}-${item.color || 'default'}`] || !item.image ? (
+                          <CartImageSkeleton />
+                        ) : (
+                          <div className="relative w-16 h-16">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                              onError={() => handleImageError(item._id || item.productId || item.id, item.color)}
+                            />
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium text-[#131212] text-sm">{item.name}</p>
                           {item.color && (
@@ -185,9 +216,9 @@ export default function CartPage() {
 
               {/* Cart Summary - Smaller and Compact */}
               <div className="lg:w-64">
-                <div className="border border-[#ebebeb] p-4 sticky top-16 lg:top-4 rounded">
+                <div className="border border-[#ebebeb] p-4 sticky top-16 lg:top-4 rounded-box">
                   <h3 className="text-base font-semibold text-[#131212] mb-3">Cart Total</h3>
-                  
+
                   <div className="space-y-2 mb-3">
                     <div className="flex justify-between text-xs">
                       <span className="text-[#6b6b6b]">Subtotal:</span>
@@ -205,11 +236,11 @@ export default function CartPage() {
 
                   <Link
                     href="/checkout"
-                    className="block w-full bg-[#52dd28ff] text-white text-center py-2.5 text-xs font-semibold hover:bg-[#45b824] transition-colors rounded"
+                    className="block w-full bg-[#52dd28ff] text-white text-center py-2.5 text-xs font-semibold hover:bg-[#45b824] transition-colors rounded-box"
                   >
                     PROCEED TO CHECKOUT
                   </Link>
-                  
+
                   <p className="text-[8px] text-center text-[#6b6b6b] mt-2">
                     Secure checkout powered by Thulira
                   </p>

@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        category: item.category || 'homeware'
+        category: item.category
       }));
 
       // In real scenario, we calculate delivery cost too. If totalAmount is given directly in API,

@@ -24,10 +24,18 @@
   --color-input: hsl(0 0% 90%);
   --color-ring: #52dd28ff;
   --radius: 0;
+  --radius-box: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
 
   /* Font variables mapped to Next.js font variables */
   --font-body: var(--font-open-sans);
   --font-heading: var(--font-poppins);
+  --font-cinzel: var(--font-cinzel);
 
   /* Amado Template semantic colors - Changed to Green */
   --color-amado-yellow: #52dd28ff;
@@ -106,7 +114,7 @@
   }
 
   .bg-eco-footer {
-    background-color: #252525;
+    background-color: #616161;
   }
 
   /* 
@@ -130,6 +138,78 @@
 }
 
 /* Note: Sidebar styles are now handled inline in the component */
+
+/* Premium Add to Cart Button Stylings */
+.premium-cart-button {
+  position: relative;
+  width: 220px;
+  height: 70px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid #52dd28ff;
+  background-color: #52dd28ff;
+  overflow: hidden;
+  transition: all 0.3s;
+  border-radius: 8px;
+}
+
+.premium-cart-button .button__text {
+  transform: translateX(35px);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.premium-cart-button .button__icon {
+  position: absolute;
+  transform: translateX(170px);
+  height: 100%;
+  width: 48px;
+  background-color: #45b824;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.premium-cart-button svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+  fill: none;
+  transition: all 0.3s;
+}
+
+.premium-cart-button:hover {
+  background: #45b824;
+}
+
+.premium-cart-button:hover .button__text {
+  color: transparent;
+}
+
+.premium-cart-button:hover .button__icon {
+  width: 100%;
+  transform: translateX(0);
+}
+
+.premium-cart-button:active .button__icon {
+  background-color: #3aa856;
+}
+
+.premium-cart-button:active {
+  border: 1px solid #3aa856;
+}
+
+.premium-cart-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
 
 /* Amado Buttons */
 .amado-btn {
