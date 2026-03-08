@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { Mail, Facebook, Twitter, Instagram, FileText, User, Heart, Search, ChevronDown, MoreHorizontal } from 'lucide-react';
+import { useCompare } from '@/context/CompareContext';
+import { Mail, Facebook, Twitter, Instagram, FileText, User, Heart, Search, ChevronDown, MoreHorizontal, X } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const navItems = [
@@ -25,6 +27,7 @@ export default function Sidebar() {
   const router = useRouter();
   const { cartCount } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
+  const { compareItems, removeFromCompare, setShowModal } = useCompare();
 
   // Check if mobile on mount and on resize
   useEffect(() => {
@@ -120,12 +123,16 @@ export default function Sidebar() {
         {/* Top Section: Logo */}
         <div style={{ flexShrink: 0 }}>
           <a href="/" style={{ display: 'block' }}>
-            <img
+            <Image
               src="/thulira.png"
               alt="Thulira - Sustainable Living"
+              width={160}
+              height={160}
+              priority
               style={{
                 maxWidth: '100%',
                 height: '160px',
+                width: 'auto',
                 display: 'block'
               }}
             />
@@ -306,6 +313,39 @@ export default function Sidebar() {
               </a>
             </div>
           </div>
+
+          {/* Compare Section */}
+          {compareItems.length > 0 && (
+            <div style={{ marginLeft: '16px', marginBottom: '16px' }}>
+              <div className="text-[10px] uppercase tracking-widest text-[#6b6b6b] mb-2 font-mono flex justify-between items-center pr-2">
+                <span>Compare ({compareItems.length}/2)</span>
+                {compareItems.length === 2 && (
+                  <button onClick={() => setShowModal(true)} className="text-[#52dd28ff] font-bold hover:underline underline-offset-2 cursor-pointer transition-all">View</button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                {compareItems.map((item, idx) => (
+                  <div key={item._id || item.id || idx} className="relative w-12 h-12 bg-[#f5f7fa] rounded border border-gray-100 group">
+                    <button 
+                      onClick={() => removeFromCompare(item._id || item.id)}
+                      className="absolute -top-1.5 -right-1.5 bg-white rounded-full shadow border z-10 p-0.5 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <X size={10} />
+                    </button>
+                    <div className="relative w-full h-full overflow-hidden rounded">
+                      <Image src={item.primaryImage || item.image} alt="compare" fill sizes="48px" className="object-cover" />
+                    </div>
+                  </div>
+                ))}
+                {/* Empty slot placeholder if only 1 item */}
+                {compareItems.length === 1 && (
+                  <div className="w-12 h-12 border border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-gray-300 text-xs">
+                    +
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Account Section */}
           <div style={{ paddingTop: '16px', paddingBottom: '16px', marginLeft: '16px', borderTop: '1px solid #ebebeb' }}>

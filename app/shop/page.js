@@ -38,6 +38,9 @@ const colorOptions = [
   { name: 'Multi', color: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1)' },
 ];
 
+
+
+
 const sortOptions = [
   { value: 'default', label: 'Default' },
   { value: 'price-asc', label: 'Price: Low to High' },
@@ -178,6 +181,13 @@ export default function ShopPage() {
     );
   };
 
+  const getPaginationOptions = (current, total) => {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+    if (current >= total - 3) return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -186,7 +196,7 @@ export default function ShopPage() {
         <div className="lg:ml-[280px] flex flex-col min-h-screen">
           <div className="h-14 lg:hidden"></div>
           <div className="flex-1 px-3 sm:px-6 py-4">
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            <div className="grid grid-cols-3 gap-3 sm:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="animate-pulse">
                   <div className="bg-muted aspect-square w-full mb-2 sm:mb-4 rounded-box"></div>
@@ -383,7 +393,7 @@ export default function ShopPage() {
 
                   {/* Products grid/list */}
                   <div className={viewMode === 'grid'
-                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-8"
+                    ? "grid grid-cols-3 gap-3 sm:gap-6 mb-8"
                     : "flex flex-col gap-3 sm:gap-4 mb-8"
                   }>
                     {paginatedProducts.map((product, i) => (
@@ -413,17 +423,21 @@ export default function ShopPage() {
                         <ChevronLeft className="w-4 h-4" />
                       </button>
 
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                        <button
-                          key={p}
-                          onClick={() => handlePageChange(p)}
-                          className={`px-3 py-1 border text-sm rounded-box transition-colors ${currentPage === p
-                            ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
-                            : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
-                            }`}
-                        >
-                          {p}
-                        </button>
+                      {getPaginationOptions(currentPage, totalPages).map((p, idx) => (
+                        p === '...' ? (
+                          <span key={`dots-${idx}`} className="px-2 text-muted-foreground">...</span>
+                        ) : (
+                          <button
+                            key={`page-${p}`}
+                            onClick={() => handlePageChange(p)}
+                            className={`px-3 py-1 border text-sm rounded-box transition-colors ${currentPage === p
+                              ? 'bg-[#52dd28ff] text-white border-[#52dd28ff]'
+                              : 'border-border text-muted-foreground hover:border-[#52dd28ff] hover:text-[#52dd28ff]'
+                              }`}
+                          >
+                            {p}
+                          </button>
+                        )
                       ))}
 
                       <button

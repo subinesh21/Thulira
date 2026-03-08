@@ -149,11 +149,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #52dd28ff;
   background-color: #52dd28ff;
   overflow: hidden;
   transition: all 0.3s;
-  border-radius: 8px;
 }
 
 .premium-cart-button .button__text {
@@ -183,7 +181,7 @@
 .premium-cart-button svg {
   width: 20px;
   height: 20px;
-  stroke: #fff;
+  stroke: #ffffff;
   fill: none;
   transition: all 0.3s;
 }

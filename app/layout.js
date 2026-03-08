@@ -3,10 +3,13 @@ import { Open_Sans, Poppins, Cinzel } from 'next/font/google';
 import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { CompareProvider } from '@/context/CompareContext';
+import CompareModal from '@/components/CompareModal';
 import { ToastContainer } from 'react-toastify';
 import './globals.css';
 import 'react-toastify/dist/ReactToastify.css';
-import IntroSlides from '@/components/IntroSlides';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 // Configure Open Sans
 const openSans = Open_Sans({
@@ -111,10 +114,13 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${openSans.variable} ${poppins.variable} ${cinzel.variable}`}>
       <body className="bg-white">
         <AuthProvider>
-          <IntroSlides />
-          <CartProvider>
-            <WishlistProvider>
-              {children}
+          <CompareProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+                <CompareModal />
+                <Analytics />
+                <SpeedInsights />
               <ToastContainer
                 position="top-center"
                 autoClose={3000}
@@ -127,8 +133,9 @@ export default function RootLayout({ children }) {
                 pauseOnHover
                 theme="light"
               />
-            </WishlistProvider>
-          </CartProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </CompareProvider>
         </AuthProvider>
       </body>
     </html>

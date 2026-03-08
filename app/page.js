@@ -7,6 +7,9 @@ import Hero from '@/components/sections/Hero';
 import CategoryGrid from '@/components/sections/CategoryGrid';
 import Footer from '@/components/sections/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
+import { generateHomeSchema } from '@/lib/schema-markup';
 
 export default function HomePage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -19,6 +22,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(generateHomeSchema())
+        }}
+      />
       <Sidebar />
       <MobileNav />
 

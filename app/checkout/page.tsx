@@ -12,6 +12,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import Sidebar from '@/components/sections/Sidebar';
 import MobileNav from '@/components/MobileNav';
 import Footer from '@/components/sections/Footer';
@@ -715,10 +716,12 @@ export default function CheckoutPage() {
                           {imageErrors[`${item._id || item.productId || item.id}-${item.color || 'default'}`] || !item.image ? (
                             <CheckoutImageSkeleton />
                           ) : (
-                            <img
+                            <Image
                               src={item.image}
                               alt={item.name}
-                              className="w-full h-full object-cover transition-transform hover:scale-110"
+                              fill
+                              sizes="64px"
+                              className="object-cover transition-transform hover:scale-110"
                               onError={() => handleImageError(String(item._id || item.productId || item.id), item.color)}
                             />
                           )}

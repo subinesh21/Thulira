@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "images": {
+    "sizes": [640, 750, 828, 1080, 1200, 1920],
+    "formats": ["image/avif", "image/webp"],
+    "minimumCacheTTL": 86400
+  },
   "builds": [
     {
       "src": "package.json",

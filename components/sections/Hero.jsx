@@ -5,9 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 const VIDEOS = [
-  "/video/cup-video-1.mp4",
-  "/video/cup-video-2.mp4",
-  "/video/cup-video-3.mp4",
+  "/video/cup-video.mp4",
 ];
 
 export default function Hero() {
@@ -35,6 +33,8 @@ export default function Hero() {
             autoPlay
             muted
             playsInline
+            preload="metadata"
+            loop
             onEnded={handleVideoEnd}
             className="absolute inset-0 w-full h-full object-cover"
           >

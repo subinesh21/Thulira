@@ -91,26 +91,15 @@ export default function ProductDetailsPage() {
     if (product && selectedColor) {
       const colorImages = product.images?.[selectedColor];
       if (colorImages && colorImages.length > 0) {
-        if (!hasUserSelectedColor) {
-          // Initial load: primary image first, then color images in thumbnails
-          const images = [
-            product.primaryImage,
-            ...colorImages
-          ].filter(Boolean);
-          setProductImages(images);
-          setSelectedImage(0);
-        } else {
-          // User clicked a color: use color images directly (first image becomes big)
-          setProductImages(colorImages);
-          setSelectedImage(0);
-        }
+        setProductImages(colorImages.filter(Boolean));
+        setSelectedImage(0);
       } else {
-        // Fallback to primary image
+        // Fallback to primary image only if no color images exist at all
         setProductImages([product.primaryImage].filter(Boolean));
         setSelectedImage(0);
       }
     }
-  }, [product, selectedColor, hasUserSelectedColor]);
+  }, [product, selectedColor]);
 
   const fetchProductDetails = async () => {
     try {
@@ -343,26 +332,22 @@ export default function ProductDetailsPage() {
       <div className="lg:ml-[280px] flex flex-col min-h-screen">
         <div className="h-14 lg:hidden"></div>
 
-        {/* Breadcrumb - Mobile Optimized */}
-        <div className="px-3 sm:px-4 lg:px-8 py-3 text-[10px] sm:text-xs font-medium tracking-wide text-[#6b6b6b] flex items-center gap-1.5 sm:gap-2 flex-wrap">
-          <Link href="/" className="hover:text-[#131212] transition-colors">
+        {/* Breadcrumb */}
+        <div className="px-3 sm:px-4 lg:px-8 py-3 text-[10px] sm:text-xs font-medium tracking-wide text-[#52dd28ff] flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          <Link href="/" className="hover:text-green-600 transition-colors">
             HOME
           </Link>
           <span>&gt;</span>
-          <Link href="/shop" className="hover:text-[#131212] transition-colors">
+          <Link href="/shop" className="hover:text-green-600 transition-colors">
             SHOP
           </Link>
           <span>&gt;</span>
-          <Link href={`/shop#${product.category}`} className="hover:text-[#131212] transition-colors capitalize">
-            {CATEGORY_INFO[product.category]?.name || product.category}
-          </Link>
-          <span>&gt;</span>
-          <span className="text-[#131212] truncate max-w-[120px] sm:max-w-none">{product.name}</span>
+          <span className="text-[#52dd28ff] truncate max-w-[120px] sm:max-w-none">{product.name}</span>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 px-3 sm:px-4 lg:px-8 pb-12">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+          <div className="flex flex-col lg:flex-row justify-center gap-6 lg:gap-10">
             {/* Image Gallery */}
             <div className="w-full lg:max-w-[450px]">
               <div className="relative w-full aspect-square overflow-hidden bg-[#f5f7fa] mb-2 sm:mb-3 lg:mb-4">
@@ -483,7 +468,10 @@ export default function ProductDetailsPage() {
             </div>
 
             {/* Product Info */}
-            <div className="flex-1 max-w-[500px] pt-2 lg:pt-4">
+            <div 
+              className="flex-1 max-w-[500px] p-4 sm:p-6 lg:p-8 rounded-box bg-cover bg-center shadow-sm border border-gray-100"
+              style={{ backgroundImage: "url('/paper.jpg')" }}
+            >
               {/* Price bar */}
               <div className="w-8 sm:w-10 lg:w-12 h-[2px] sm:h-[3px] bg-[#52dd28ff] mb-3 sm:mb-4" />
 
@@ -722,7 +710,8 @@ export default function ProductDetailsPage() {
       {showReviewModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50" onClick={() => setShowReviewModal(false)}>
           <div
-            className="bg-white rounded-box w-full max-w-md p-5 sm:p-6 relative"
+            className="bg-white rounded-box w-full max-w-md p-5 sm:p-6 relative bg-cover bg-center"
+            style={{ backgroundImage: "url('/paper.jpg')" }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -732,13 +721,13 @@ export default function ProductDetailsPage() {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-bold text-[#131212] mb-1">Write a Review</h3>
+            <h3 className="text-lg font-cinzel text-[#131212] mb-1">Write a Review</h3>
             <p className="text-xs text-[#6b6b6b] mb-5">for {product.name}</p>
 
             <form onSubmit={handleSubmitReview} className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-xs font-medium text-[#131212] mb-1">Your Name</label>
+                <label className="block text-xs font-mono text-[#131212] mb-1">Your Name</label>
                 <input
                   type="text"
                   value={reviewForm.reviewerName}
@@ -751,7 +740,7 @@ export default function ProductDetailsPage() {
 
               {/* Star Rating */}
               <div>
-                <label className="block text-xs font-medium text-[#131212] mb-2">Rating</label>
+                <label className="block text-xs font-mono text-[#131212] mb-2">Rating</label>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -762,8 +751,8 @@ export default function ProductDetailsPage() {
                     >
                       <Star
                         className={`w-7 h-7 transition-colors ${star <= reviewForm.rating
-                          ? 'fill-[#52dd28ff] text-[#52dd28ff]'
-                          : 'text-gray-300 hover:text-[#52dd28ff]'
+                          ? 'fill-[#ffbb00] text-[#ffbb00]'
+                          : 'text-gray-300 hover:text-[#ffbb00]'
                           }`}
                       />
                     </button>
@@ -774,7 +763,7 @@ export default function ProductDetailsPage() {
 
               {/* Comment */}
               <div>
-                <label className="block text-xs font-medium text-[#131212] mb-1">Your Review</label>
+                <label className="block text-xs font-mono text-[#131212] mb-1">Your Review</label>
                 <textarea
                   value={reviewForm.comment}
                   onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}

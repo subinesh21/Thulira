@@ -4,9 +4,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Eye, Heart, Image as ImageIcon } from 'lucide-react';
+import { ShoppingCart, Eye, Heart, Scale, Image as ImageIcon } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCompare } from '@/context/CompareContext';
 import { useRouter } from 'next/navigation';
 
 export default function ProductCard({ product, categoryImage, viewMode = 'grid' }) {
@@ -14,6 +15,7 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
   const [imageError, setImageError] = useState(false);
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
+  const { addToCompare } = useCompare();
   const router = useRouter();
 
   const handleAddToCart = (e) => {
@@ -164,13 +166,13 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
               alt={`${product.name} - Thulira sustainable product`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              className="object-cover transition-transform duration-600 group-hover:scale-[1.03]"
               onError={() => {
                 setImageError(true);
               }}
             />
           ) : (
-            <div className="w-full h-full transition-transform duration-500 group-hover:scale-110">
+            <div className="w-full h-full transition-transform duration-600 group-hover:scale-[1.03]">
               <ImageSkeleton />
             </div>
           )}
@@ -184,24 +186,31 @@ export default function ProductCard({ product, categoryImage, viewMode = 'grid' 
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock}
-              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['CART'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle text-gray-700 hover:text-[#52dd28ff] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['CART'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
               aria-label="Add to cart"
             >
-              🛒
+              <ShoppingCart className="w-4 h-4" />
             </button>
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(`/detail/${product._id || product.id}`); }}
-              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['VIEW'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle text-gray-700 hover:text-[#52dd28ff] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['VIEW'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
               aria-label="Quick view"
             >
-              👁️
+              <Eye className="w-4 h-4" />
             </button>
             <button
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToWishlist(product); }}
-              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['WISH'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
+              className={`relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle ${isInWishlist(product._id || product.id) ? 'text-red-500' : 'text-gray-700 hover:text-red-500'} before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['WISH'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm`}
               aria-label="Add to wishlist"
             >
-              {isInWishlist(product._id || product.id) ? '❤️' : '🤍'}
+              <Heart className={`w-4 h-4 ${isInWishlist(product._id || product.id) ? 'fill-current' : ''}`} />
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCompare(product); }}
+              className="relative w-9 h-9 flex items-center justify-center bg-gray-100/90 hover:bg-gray-200 rounded-circle text-gray-700 hover:text-blue-500 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-300 before:flex before:justify-center before:items-center before:h-5 before:text-[0.55rem] before:px-2 before:content-['COMPARE'] before:bg-black/70 before:text-white before:absolute before:-top-8 before:rounded-md hover:-translate-y-2 cursor-pointer transition-all shadow-sm"
+              aria-label="Compare"
+            >
+              <Scale className="w-4 h-4" />
             </button>
           </div>
 

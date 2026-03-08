@@ -18,7 +18,7 @@ async function migrateProducts() {
       name: { type: String, required: true, trim: true },
       price: { type: Number, required: true, min: 0 },
       originalPrice: { type: Number, min: 0 },
-      primaryImage: { type: String, required: true },
+      primaryImage: { type: String },
       hoverImage: { type: String },
       images: {
         type: Map,
